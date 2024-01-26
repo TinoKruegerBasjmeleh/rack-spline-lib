@@ -19,6 +19,5 @@ jobs:
           NUM_COMMITS=`git log --oneline origin/${{ github.base_ref }}..HEAD | wc -l`
           echo "Formatting $NUM_COMMITS commits ..."
           git-clang-format-13 --binary clang-format-13 --extensions h,cpp HEAD~$NUM_COMMITS
-          git checkout main/tims
           DIFF_LINES=`git diff | wc -l`
           test $DIFF_LINES -eq 0
