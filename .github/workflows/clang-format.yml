@@ -1,0 +1,24 @@
+name: Check if committed files are formatted properly with git-clang-format
+
+on: pull_request
+
+jobs:
+  clang-format:
+    name: Check if changes made in this pull request are properly formatted
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+        
+      - name: Check if changed files are formatted
+        run: |
+          NUM_COMMITS=`git log --oneline origin/${{ github.base_ref }}..HEAD | wc -l`
+          echo "Formatting $NUM_COMMITS commits ..."
+          git-clang-format-13 --binary clang-format-13 --extensions h,cpp HEAD~$NUM_COMMITS
+          git checkout main/tims
+          DIFF_LINES=`git diff | wc -l`
+          test $DIFF_LINES -eq 0

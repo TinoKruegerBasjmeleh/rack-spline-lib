@@ -1,0 +1,14 @@
+build*
+Debug
+.cproject
+.project
+.settings
+.vscode
+*.class
+.classpath
+*.lo
+*.o
+*.swo
+*.swp
+
+
