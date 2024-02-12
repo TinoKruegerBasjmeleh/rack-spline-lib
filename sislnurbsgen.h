@@ -57,6 +57,7 @@ class SislNurbsGen {
 
   /**
    * @brief CreateCurveByBlendingCurves
+   * ääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääää
    * To compute a blending curve between two curves. Two points indicate
    * between which ends the blend is to be produced. The blending curve is
    * either a circle or an approximated conic section if this is possible,
