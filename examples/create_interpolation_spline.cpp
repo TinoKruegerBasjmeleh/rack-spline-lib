@@ -3,13 +3,12 @@
 #include "sislnurbsgen.h"
 
 int main() {
-  // Create a simple spline
-  std::cout << "Create a simple spline" << std::endl;
+  // Create an interpolation spline
+  std::cout << "Create an interpolation spline" << std::endl;
 
   SislNurbsGen          gen;
   SislNurbsGen          inter;
-  SislNurbsGen          off;
-  SislNurbsGen          blended;
+
   std::vector<point_2d> points{{
                                    0,
                                    0,
@@ -26,9 +25,13 @@ int main() {
   float max_par = gen.CalcMaxParameterVal();
   float min_par = gen.CalcMinParameterVal();
 
-  gen.PlotCurve("curve_points.txt", min_par, max_par, 50);
-  gen.PlotCurvature("curvature.txt", min_par, max_par, 50);
-  gen.PlotCtrlPoints("controlpoints.txt");
+  inter.SetInterrogationPoints(points);
+  inter.SetCurveParameter(5);
+  inter.CreateCurveByInterpolation();
+  max_par = inter.CalcMaxParameterVal();
+  min_par = inter.CalcMinParameterVal();
+  inter.PlotCurve("intercurve_points.txt", min_par, max_par, 50);
 
+  inter.PlotCurvature("intercurvature.txt", min_par, max_par, 50);
   return 0;
 }
