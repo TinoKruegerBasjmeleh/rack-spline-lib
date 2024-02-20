@@ -65,3 +65,19 @@ target_include_directories(${BLENDED} PUBLIC
     "${CMAKE_BINARY_DIR}/librack-spline.a"
     "${CMAKE_BINARY_DIR}/sisl_lib-prefix/src/sisl_lib-build/libsisl.a"
         )
+
+set(S_SHAPE "create_s_spline")
+set(SOURCES_S_SHAPE
+        create_s_spline.cpp
+         )
+add_executable(${S_SHAPE} ${SOURCES_S_SHAPE})
+target_include_directories(${S_SHAPE} PUBLIC
+                         ${CMAKE_SOURCE_DIR}
+                         ${CMAKE_BINARY_DIR}/${SISL_PROJECT_NAME}-prefix/src/${SISL_PROJECT_NAME}/include
+                         ${CMAKE_INSTALL_PREFIX}/include/rack
+                       )
+target_link_libraries(${S_SHAPE}
+                                            "${CMAKE_BINARY_DIR}/librack-spline.a"
+                                            "${CMAKE_BINARY_DIR}/sisl_lib-prefix/src/sisl_lib-build/libsisl.a"
+                                            )
+
