@@ -65,3 +65,17 @@ target_include_directories(${BLENDED} PUBLIC
     "${CMAKE_BINARY_DIR}/librack-spline.a"
     "${CMAKE_BINARY_DIR}/sisl_lib-prefix/src/sisl_lib-build/libsisl.a"
         )
+
+set(TIMEMEASURE "measure_time")
+set(SOURCES_TIMEMEASURE
+        time_measure_spline.cpp
+         )
+add_executable(${TIMEMEASURE} ${SOURCES_TIMEMEASURE})
+target_include_directories(${TIMEMEASURE} PUBLIC
+                               ${CMAKE_SOURCE_DIR}
+                               ${CMAKE_BINARY_DIR}/${SISL_PROJECT_NAME}-prefix/src/${SISL_PROJECT_NAME}/include
+                               ${CMAKE_INSTALL_PREFIX}/include/rack
+                             )
+target_link_libraries(${TIMEMEASURE}
+                          "${CMAKE_BINARY_DIR}/librack-spline.a"
+                          "${CMAKE_BINARY_DIR}/sisl_lib-prefix/src/sisl_lib-build/libsisl.a")
