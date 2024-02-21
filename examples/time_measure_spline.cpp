@@ -42,9 +42,9 @@ int main() {
     new_points.push_back({pos.x, pos.y});
   }
 
-  gen.PlotCurve("curve_points.txt", min_par, max_par, 10000);
+  gen.PlotCurve("time_curve_points.txt", min_par, max_par, 10000);
   gen.PlotCurvature("curvature.txt", min_par, max_par, 10000);
-  gen.PlotCtrlPoints("controlpoints.txt");
+  gen.PlotCtrlPoints("time_controlpoints.txt");
 
   std::cout << "Create a spline by interpolation" << std::endl;
   auto start = high_resolution_clock::now();

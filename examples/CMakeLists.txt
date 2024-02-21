@@ -167,3 +167,28 @@ target_link_libraries(${PATH_BASED_SPLINE}
 set_target_properties(${PATH_BASED_SPLINE} PROPERTIES
                       CXX_STANDARD 17
                       CXX_EXTENSIONS OFF)
+
+#------ Calculate the cord length of a spline
+#------ add new function and example to calculate the cord length of a given spline
+
+set(CORD_LENGTH "cord_length")
+set(SOURCES_CORD_LENGTH
+     calculate_spline_length.cpp
+   )
+
+add_executable(${CORD_LENGTH} ${SOURCES_CORD_LENGTH})
+
+target_include_directories(${CORD_LENGTH} PUBLIC
+                           ${CMAKE_SOURCE_DIR}
+                           ${CMAKE_BINARY_DIR}/${SISL_PROJECT_NAME}-prefix/src/${SISL_PROJECT_NAME}/include
+                           ${CMAKE_INSTALL_PREFIX}/include/rack
+                         )
+
+target_link_libraries(${CORD_LENGTH}
+                      "${CMAKE_BINARY_DIR}/librack-spline.a"
+                      "${CMAKE_BINARY_DIR}/sisl_lib-prefix/src/sisl_lib-build/libsisl.a"
+                      )
+
+set_target_properties(${CORD_LENGTH} PROPERTIES
+                      CXX_STANDARD 17
+                      CXX_EXTENSIONS OFF)

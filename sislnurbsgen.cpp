@@ -404,6 +404,37 @@ double SislNurbsGen::CalcMinParameterVal() {
   min_par_val = curve_->et[0];
   return min_par_val;
 }
+
+double SislNurbsGen::SampAccurCordLeng(float min_par, float max_par,
+                                       int samples) {
+  float       length{};
+  double      inc = (max_par - min_par) / samples;
+  position_2d pos1{};
+  position_2d pos2{};
+
+  GetPosition(min_par, pos1);
+  for (float f = min_par + inc; f < max_par; f += inc) {
+    GetPosition(f + inc, pos2);
+    double x_diff_sq = (pos2.x - pos1.x) * (pos2.x - pos1.x);
+    double y_diff_sq = (pos2.y - pos1.y) * (pos2.y - pos1.y);
+    length += sqrt(x_diff_sq + y_diff_sq);
+    pos1 = pos2;
+  }
+
+  return double(length);
+}
+
+double SislNurbsGen::CalcCordLength() {
+  double epsge = 0.001;
+  double length;
+  int    stat = 0;
+
+  if (curve_) {
+    s1240(curve_, epsge, &length, &stat);
+  }
+  return length;
+}
+
 SISLCurve* SislNurbsGen::GetSislCurve() { return curve_; }
 
 SislNurbsGen::SislNurbsGen() {
