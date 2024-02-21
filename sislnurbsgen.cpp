@@ -46,13 +46,18 @@ int SislNurbsGen::SetInterrogationPoints(const std::vector<point_2d>& points) {
     p.x = pos.x;
     p.y = pos.y;
     points_.push_back(p);
-    points_type_.push_back(1);  // ordenary point
+    points_type_.push_back(1);
   }
   return 0;
 }
 
 int SislNurbsGen::CreateCurve() {
   CreateKnotVector(ctrl_.size(), param_.order - 1);
+
+  if (curve_) {
+    freeCurve(curve_);
+  }
+
   if (knots_.size()) {
     curve_ = newCurve(ctrl_.size(),   // number of control points
                       param_.order,   // order of spline curve (degree (p) + 1)
@@ -75,12 +80,25 @@ int SislNurbsGen::CreateCurve() {
   return 0;
 }
 
-int SislNurbsGen::CreateCurveByInterpolation() {
+int SislNurbsGen::CreateCurveByConstraintedInterpolation(double angle_start,
+                                                         double angle_end) {
   double  cendpar;
   double* gpar = 0;
   int     jnbpar;
   int     jstat = 0;
 
+  // add constraints at the start and end of the curve
+  SislPoint p{};
+  p = GetAngleBasedDerivative(angle_start);
+  points_.insert(points_.begin(), p);
+  points_type_.insert(points_type_.begin(), 3);
+  p = GetAngleBasedDerivative(angle_end);
+  points_.push_back(p);
+  points_type_.push_back(4);
+
+  if (curve_) {
+    freeCurve(curve_);
+  }
   s1356(reinterpret_cast<double*>(points_.data()),  // pointer to where the
                                                     // point coordinates are
                                                     // stored
@@ -110,6 +128,9 @@ int SislNurbsGen::CreateCurveByOffset(SISLCurve* base, point_2d& dir,
   int       stat{};
   SislPoint d{static_cast<double>(dir.x), static_cast<double>(dir.y)};
 
+  if (curve_) {
+    freeCurve(curve_);
+  }
   s1360(base,                           // the 'old' curve
         offset,                         // the offset value
         epsge,                          // geometric tolerance
@@ -123,6 +144,41 @@ int SislNurbsGen::CreateCurveByOffset(SISLCurve* base, point_2d& dir,
   return stat;
 }
 
+int SislNurbsGen::CreateCurveByInterpolation(const bool no_curvature_at_start,
+                                             const bool no_curvature_at_end) {
+  double  cendpar;
+  double* gpar = 0;
+  int     jnbpar;
+  int     jstat = 0;
+
+  if (curve_) {
+    freeCurve(curve_);
+  }
+  s1356(reinterpret_cast<double*>(points_.data()),  // pointer to where the
+                                                    // point coordinates are
+                                                    // stored
+        points_.size(),       // number of points to be interpolated
+        param_.dim,           // the dimension
+        points_type_.data(),  // what type of information is stored at a
+                              // particular point
+        static_cast<int>(no_curvature_at_start),  // no additional condition at
+                                                  // start point
+        static_cast<int>(no_curvature_at_end),    // no additional condition at
+                                                  // end point
+        1,                                        // open curve
+        param_.order,  // order of the spline curve to be produced
+        0.0,           // parameter value to be used at start of curve
+        &cendpar,  // parameter value at the end of the curve (to be determined)
+        &curve_,   // the resulting spline curve (to be determined)
+        &gpar,     // pointer to the parameter values of the points in the curve
+                   // (to be determined)
+        &jnbpar,   // number of unique parameter values (to be determined)
+        &jstat);   // status message
+
+  is_created_ = true;
+
+  return jstat;
+}
 int SislNurbsGen::PlotCurve(std::string filename, float min_par, float max_par,
                             int samples) {
   std::ofstream out(filename, std::ios::trunc | std::ios::out);
@@ -135,7 +191,7 @@ int SislNurbsGen::PlotCurve(std::string filename, float min_par, float max_par,
   if (out.is_open()) {
     for (float f = min_par; f < max_par; f += inc) {
       GetPosition(f, pos);
-      out << pos.x << "  " << pos.y << "  " << pos.rho << "  " << std::endl;
+      out << pos.x << "\t" << pos.y << "\t" << pos.rho << "\t" << std::endl;
     }
     out.flush();
     out.close();
@@ -201,6 +257,9 @@ int SislNurbsGen::CreateCurveByBlendingCurves(SISLCurve* first,
     freeCurve(second_loc_1);
   }
 
+  if (curve_) {
+    freeCurve(curve_);
+  }
   s1606(first_loc_1,                              // the first input curve
         second_loc_2,                             // the second input curve
         epsge,                                    // geometric tolerance
@@ -220,12 +279,30 @@ int SislNurbsGen::CreateCurveByBlendingCurves(SISLCurve* first,
   return stat;
 }
 
+int SislNurbsGen::CreateCurveByPathSegments(path_data* data) {
+  points_.clear();
+  points_type_.clear();
+
+  for (int i = 0; i < data->splineNum; i++) {
+    points_.push_back({static_cast<double>(data->spline[i].startPos.x),
+                       static_cast<double>(data->spline[i].startPos.y)});
+    points_type_.push_back(1);
+  }
+  // take care of the last point
+  points_.push_back(
+      {static_cast<double>(data->spline[data->splineNum - 1].endPos.x),
+       static_cast<double>(data->spline[data->splineNum - 1].endPos.y)});
+  points_type_.push_back(1);
+
+  return CreateCurveByInterpolation();
+}
+
 int SislNurbsGen::PlotCtrlPoints(std::string filename) {
   std::ofstream out(filename, std::ios::trunc | std::ios::out);
 
   if (out.is_open()) {
     for (SislPoint cp : ctrl_) {
-      out << cp.x << "  " << cp.y << std::endl;
+      out << cp.x << "\t" << cp.y << std::endl;
     }
     out.flush();
     out.close();
@@ -249,7 +326,7 @@ int SislNurbsGen::PlotCurvature(std::string filename, float min_par,
   if (out.is_open()) {
     for (float f = min_par; f < max_par; f += inc) {
       GetCurvature(f, curvature);
-      out << i << "    " << curvature << std::endl;
+      out << i << "\t" << curvature << std::endl;
       i++;
     }
     out.flush();
@@ -261,10 +338,13 @@ int SislNurbsGen::PlotCurvature(std::string filename, float min_par,
   return 0;
 }
 
-int SislNurbsGen::GetPosition(const float par_val, position_2d& pos) {
+int SislNurbsGen::GetPosition(const float par_val, position_2d& pos,
+                              const bool neg_x) {
   int    leftknot{0};
   double derive[param_.dim * 2]{};  // 2x to hold the derivatives 1.order
   int    stat{};
+  double add_pi = neg_x ? M_PI : 0;
+
   pos = {};
   if (!is_created_) {
     return EOPNOTSUPP;
@@ -274,10 +354,10 @@ int SislNurbsGen::GetPosition(const float par_val, position_2d& pos) {
         1,  // 0 for position, 1 ..x add derivatives
         par_val, &leftknot, derive, &stat);
   if (!stat) {
-    pos.x       = derive[X_];
-    pos.y       = derive[Y_];
+    pos.x       = derive[kX];
+    pos.y       = derive[kY];
     float angle = AngleTool::normaliseAngleSym0(
-        atan2(derive[Y_ + param_.dim], derive[X_ + param_.dim]) + M_PI);
+        atan2(derive[kY + param_.dim], derive[kX + param_.dim]) + add_pi);
     pos.rho = angle;
   }
   return stat;
@@ -297,10 +377,10 @@ int SislNurbsGen::GetCurvature(float par_val, double& curvature) {
   if (!stat) {
     SislPoint first{};
     SislPoint second{};
-    first.x    = derive[X_ + 2];
-    first.y    = derive[Y_ + 2];
-    second.x   = derive[X_ + 4];
-    second.y   = derive[Y_ + 4];
+    first.x    = derive[kX + 2];
+    first.y    = derive[kY + 2];
+    second.x   = derive[kX + 4];
+    second.y   = derive[kY + 4];
 
     float norm = sqrt(first.x * first.x + first.y * first.y);
 
@@ -326,7 +406,11 @@ double SislNurbsGen::CalcMinParameterVal() {
 }
 SISLCurve* SislNurbsGen::GetSislCurve() { return curve_; }
 
-SislNurbsGen::SislNurbsGen() {}
+SislNurbsGen::SislNurbsGen() {
+  ctrl_.reserve(PATH_SPLINE_MAX);
+  points_.reserve(PATH_SPLINE_MAX);
+  points_type_.reserve(PATH_SPLINE_MAX);
+}
 SislNurbsGen::~SislNurbsGen() {
   if (curve_) {
     freeCurve(curve_);

@@ -3,6 +3,7 @@
 
 #include "main/defines/position2d.h"
 #include "main/defines/point2d.h"
+#include "navigation/path_proxy.h"
 
 #include "sisl.h"
 
@@ -13,7 +14,7 @@
 
 class CurveParameter {
  public:
-  int order{2};  /// order of spline curve (degree + 1)
+  int order{4};  /// order of spline curve (degree + 1)
   int kind{1};   /// kind = polynomial B-spline curve
   int dim{2};    /// dimension
   CurveParameter() {}
@@ -33,12 +34,13 @@ class SislNurbsGen {
   std::vector<SislPoint> ctrl_;
   std::vector<SislPoint> points_;
   std::vector<int>       points_type_;
-  static constexpr int   X_            = 0;
-  static constexpr int   Y_            = 1;
-  static constexpr int   Z_            = 2;
+  static constexpr int   kX            = 0;
+  static constexpr int   kY            = 1;
+  static constexpr int   kZ            = 2;
   bool                   knots_created = false;
   bool                   params_set    = false;
   bool                   is_created_   = false;
+
   /**
    * @brief CreateKnotVector
    * @param n number of control points
@@ -47,17 +49,32 @@ class SislNurbsGen {
    */
   bool                   CreateKnotVector(int n, int p);
 
+  /**
+   * @brief GetAngleBasedDerivative
+   * To compute the first derivative of the curve at a given angle.
+   * @param angle
+   * @return SislPoint
+   */
+  SislPoint              GetAngleBasedDerivative(const double angle) {
+    SislPoint p{1.0, 0.0};
+    p.y = tan(angle);
+    return p;
+  }
+
  public:
   int        SetCurveParameter(const int order, const int dim = 2);
   int        SetCtrlPoints(const std::vector<point_2d> ctrl_points);
   int        SetInterrogationPoints(const std::vector<point_2d>& points);
   int        CreateCurve();
-  int        CreateCurveByInterpolation();
+  int        CreateCurveByInterpolation(const bool no_curvature_at_start = true,
+                                        const bool no_curvature_at_end = true);
+  int        CreateCurveByConstraintedInterpolation(double angle_start,
+                                                    double angle_end);
   int        CreateCurveByOffset(SISLCurve* base, point_2d& dir, float offset);
+  int        CreateCurveByPathSegments(path_data* data);
 
   /**
    * @brief CreateCurveByBlendingCurves
-   * ääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääää
    * To compute a blending curve between two curves. Two points indicate
    * between which ends the blend is to be produced. The blending curve is
    * either a circle or an approximated conic section if this is possible,
@@ -83,12 +100,15 @@ class SislNurbsGen {
   /**
    * @brief GetPosition
    * To compute the position based on the first derivatives of the curve at a
-   given par_val Evaluation from the left hand side.
+   * given par_val Evaluation from the left hand side.
    * @param par_val
    * @param pos calculated position if return = 0
+   * @param neg_x if true, the evaluation is based on a negative axis
+   * orientation (default -> anti fork direction)
    * @return status messages > 0 : warning; = 0 : ok; < 0 : error
    */
-  int        GetPosition(const float par_val, position_2d& pos);
+  int        GetPosition(const float par_val, position_2d& pos,
+                         const bool neg_x = true);
 
   /**
    * @brief GetCurvature
