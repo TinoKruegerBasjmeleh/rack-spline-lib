@@ -1,3 +1,17 @@
+// SislNurbsGen
+// Copyright (C) 2024 KION Group AG
+//
+// All rights reserved.
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// Author
+//     Tino Krueger <tino.krueger@kiongroup.com>
+//     Ilef Mghirbi <ilef.mghirbi@kiongroup.com>
+
 #include <iostream>
 
 #include "navigation/path_proxy.h"

@@ -1,5 +1,18 @@
+// SislNurbsGen
+// Copyright (C) 2024 KION Group AG
+//
+// All rights reserved.
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// Author
+//     Tino Krueger <tino.krueger@kiongroup.com>
+//     Ilef Mghirbi <ilef.mghirbi@kiongroup.com>
+
 #include "sislnurbsgen.h"
-#include "main/rack_math.h"
 
 bool SislNurbsGen::CreateKnotVector(int n, int p) {
   knots_.clear();
@@ -385,7 +398,7 @@ int SislNurbsGen::GetCurvature(float par_val, double& curvature) {
     float norm = sqrt(first.x * first.x + first.y * first.y);
 
     curvature  = std::numeric_limits<double>::max();
-    if (!RackMath::isEqual(norm, 0.0f)) {
+    if (!isEqual(norm, 0.0f)) {
       curvature =
           (first.x * second.y - first.y * second.x) / (norm * norm * norm);
     }
@@ -418,6 +431,7 @@ double SislNurbsGen::SampAccurCordLeng(float min_par, float max_par,
     double x_diff_sq = (pos2.x - pos1.x) * (pos2.x - pos1.x);
     double y_diff_sq = (pos2.y - pos1.y) * (pos2.y - pos1.y);
     length += sqrt(x_diff_sq + y_diff_sq);
+    length += CalcDist(pos1, pos2);
     pos1 = pos2;
   }
 

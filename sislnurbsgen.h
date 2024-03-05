@@ -1,3 +1,17 @@
+// SislNurbsGen
+// Copyright (C) 2024 KION Group AG
+//
+// All rights reserved.
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// Author
+//     Tino Krueger <tino.krueger@kiongroup.com>
+//     Ilef Mghirbi <ilef.mghirbi@kiongroup.com>
+
 #ifndef SISLNURBSGEN_H
 #define SISLNURBSGEN_H
 
@@ -41,6 +55,14 @@ class SislNurbsGen {
   bool                   params_set    = false;
   bool                   is_created_   = false;
 
+  enum DISTANCETYPE { EUCLIDEAN = 0, MANHATTAN = 1 };
+  static constexpr float kDivZeroPrevention = 0.46e-9;  //>to prevent an
+                                                        // division through
+                                                        // zero, this is the
+                                                        // proving value
+                                                        // 1/(2^31) floating
+                                                        // point mapping
+
   /**
    * @brief CreateKnotVector
    * @param n number of control points
@@ -59,6 +81,94 @@ class SislNurbsGen {
     SislPoint p{1.0, 0.0};
     p.y = tan(angle);
     return p;
+  }
+
+  /**
+   * @brief isEqual
+   * use this function most of the time to compare two different floating
+   * point numbers. Tolerance needs to be meaningful in your context.
+   * Default tolerance is DIVZERO_PREVENTION to be safe while using a
+   * denominator.
+   * @warning please be aware, that the function is trimmed to be easy readable
+   * and high performance. Relative errors and ULPS are not considered. Your
+   * solution is therefore realated to the floating point representation of your
+   * values.
+   * @param a floating point number to compare
+   * @param b sec floating point number to compare
+   * @param tolerance comparism parameter to evaluate equality
+   * @return returns true if a is approximately == b and false otherwise
+   */
+  template <typename T>
+  static constexpr bool isEqual(
+      T a, T b, T tolerance = static_cast<T>(kDivZeroPrevention)) {
+    static_assert(std::is_floating_point_v<T>,
+                  "Floating point comparisons "
+                  "require type float, double, or long double.");
+
+    if (std::abs(a - b) <= tolerance) return true;
+
+    return false;
+  }
+
+  /**
+   * @brief isEqualZero
+   * use this function to compare single floating
+   * point to zero. Tolerance needs to be meaningful in your context.
+   * Default tolerance is DIVZERO_PREVENTION to be safe while
+   * using a denominator.
+   * @param a floating point number to compare with zero
+   * @param tolerance comparism parameter to evaluate equality
+   * @return returns true if a is approximately == 0, and false otherwise
+   */
+  template <typename T>
+  static constexpr bool isEqualZero(
+      T a, T tolerance = static_cast<T>(kDivZeroPrevention)) {
+    static_assert(std::is_floating_point_v<T>,
+                  "Floating point comparisons "
+                  "require type float, double, or long double.");
+    return isEqual(a, static_cast<T>(0.0), tolerance);
+  }
+
+  /*!
+   * @brief Calculate the squared euclidean distance from one point to another
+   *        represented by their integer coordinates
+   * @param a_x x coordinate of point a
+   * @param b_x x coordinate of point b
+   * @param a_y y coordiante of point a
+   * @param b_y y coordinate of point b
+   * @return Squared euclidean distance in between
+   */
+  float CalcSquaredDist(const float& a_x, const float& b_x, const float& a_y,
+                        const float& b_y) {
+    return ((a_x - b_x) * (a_x - b_x) + (a_y - b_y) * (a_y - b_y));
+  }
+  /*!
+   * @brief Calculate a type dependent distance between given 2d coordinates
+   *        represented by their integer coordinates
+   * @param a_x x coordinate of point a
+   * @param b_x x coordinate of point b
+   * @param a_y y coordiante of point a
+   * @param b_y y coordinate of point b
+   * @param type  distance type (actually only EUCLIDEAN and MANHATTAN is
+   * supported)
+   * @return distance in between
+   */
+  float CalcDist(const float& a_x, const float& b_x, const float& a_y,
+                 const float& b_y, DISTANCETYPE type) {
+    switch (type) {
+      case EUCLIDEAN:
+        return (sqrtf(CalcSquaredDist(a_x, b_x, a_y, b_y)));
+      case MANHATTAN:
+        return (abs(a_x - b_x) + abs(a_y - b_y));
+      default:
+        return 0.0f;  // not supported;
+    }
+  }
+
+  template <class T>
+  float CalcDist(const T& p1, const T& p2,
+                 DISTANCETYPE type = DISTANCETYPE::EUCLIDEAN) {
+    return CalcDist((float)p1.x, (float)p2.x, (float)p1.y, (float)p2.y, type);
   }
 
  public:
