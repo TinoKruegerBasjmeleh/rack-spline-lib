@@ -1,3 +1,17 @@
+// SislNurbsGen
+// Copyright (C) 2024 KION Group AG
+//
+// All rights reserved.
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// Author
+//     Tino Krueger <tino.krueger@kiongroup.com>
+//     Ilef Mghirbi <ilef.mghirbi@kiongroup.com>
+
 #include <chrono>
 
 #include "sislnurbsgen.h"
@@ -12,15 +26,8 @@ int main() {
 
   std::vector<point_2d> new_points;
 
-  std::vector<point_2d> points{{
-                                   0,
-                                   0,
-                               },
-                               {0, 10000},
-                               {0, 15000},
-                               {0, 30000},
-                               {10000, 30000},
-                               {15000, 30000},
+  std::vector<point_2d> points{{0, 0},        {0, 10000},     {0, 15000},
+                               {0, 30000},    {10000, 30000}, {15000, 30000},
                                {30000, 30000}};
 
   gen.SetCtrlPoints(points);
@@ -42,9 +49,9 @@ int main() {
     new_points.push_back({pos.x, pos.y});
   }
 
-  gen.PlotCurve("curve_points.txt", min_par, max_par, 10000);
+  gen.PlotCurve("time_curve_points.txt", min_par, max_par, 10000);
   gen.PlotCurvature("curvature.txt", min_par, max_par, 10000);
-  gen.PlotCtrlPoints("controlpoints.txt");
+  gen.PlotCtrlPoints("time_controlpoints.txt");
 
   std::cout << "Create a spline by interpolation" << std::endl;
   auto start = high_resolution_clock::now();
