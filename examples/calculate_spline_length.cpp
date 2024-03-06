@@ -17,26 +17,27 @@
 #include "sislnurbsgen.h"
 
 int main() {
-  // Create a simple spline
-  std::cout << "Create a simple spline" << std::endl;
+  // Create an S shaped spline
+  std::cout << "Create an S shaped spline" << std::endl;
 
-  SislNurbsGen          gen;
-  SislNurbsGen          inter;
-  SislNurbsGen          off;
-  SislNurbsGen          blended;
+  SislNurbsGen          spline;
+
   std::vector<point_2d> points{
       {0, 0}, {0, 1000}, {0, 6000}, {5000, 6000}, {6000, 6000}};
 
-  gen.SetCtrlPoints(points);
-  gen.SetCurveParameter(4);
-  gen.CreateCurve();
+  spline.SetCtrlPoints(points);
+  spline.SetCurveParameter(4);
+  spline.CreateCurve();
 
-  float max_par = gen.CalcMaxParameterVal();
-  float min_par = gen.CalcMinParameterVal();
+  float  min_par = spline.CalcMinParameterVal();
+  float  max_par = spline.CalcMaxParameterVal();
 
-  gen.PlotCurve("curve_points.txt", min_par, max_par, 50);
-  gen.PlotCurvature("curvature.txt", min_par, max_par, 50);
-  gen.PlotCtrlPoints("controlpoints.txt");
+  double length  = spline.CalcCordLength();
+  std::cout << "Spline length is: " << length << " mm" << std::endl;
+
+  spline.PlotCurve("s_curve_points.txt", min_par, max_par, 100);
+  spline.PlotCurvature("s_curvature.txt", min_par, max_par, 100);
+  spline.PlotCtrlPoints("s_controlpoints.txt");
 
   return 0;
 }

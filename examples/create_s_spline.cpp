@@ -1,3 +1,17 @@
+// SislNurbsGen
+// Copyright (C) 2024 KION Group AG
+//
+// All rights reserved.
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// Author
+//     Tino Krueger <tino.krueger@kiongroup.com>
+//     Ilef Mghirbi <ilef.mghirbi@kiongroup.com>
+
 #include <iostream>
 
 #include "sislnurbsgen.h"
@@ -10,13 +24,7 @@ int main() {
   SislNurbsGen          offset_neg;
   SislNurbsGen          offset_pos;
 
-  std::vector<point_2d> points{{
-                                   0,
-                                   0,
-                               },
-                               {1500, 6000},
-                               {3000, 50},
-                               {4500, 6000}};
+  std::vector<point_2d> points{{0, 0}, {1500, 6000}, {3000, 50}, {4500, 6000}};
 
   s_spline.SetCtrlPoints(points);
   s_spline.SetCurveParameter(4);
