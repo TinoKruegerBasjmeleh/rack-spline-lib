@@ -65,6 +65,7 @@ int main() {
   max_par = gen.GetMaxParameterVal();
   gen.PlotCurve("path_points.txt", min_par, max_par, 150);
   gen.PlotCurvature("path_curvature.txt", min_par, max_par, 150);
+
   position_2d start{}, end{};
   gen.GetPosition(min_par, start);
   gen.GetPosition(max_par, end);
