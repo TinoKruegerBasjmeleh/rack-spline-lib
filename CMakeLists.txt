@@ -43,7 +43,19 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 
 if(BUILD_EXAMPLES)
   add_subdirectory(examples)
-endif(BUILD_EXAMPLES)
+
+
+  #set the source and destination paths  
+  set(SOURCE_FILE "${CMAKE_CURRENT_SOURCE_DIR}/examples/TestVisual_examples.ipynb")  
+  set(DESTINATION_FILE "${CMAKE_CURRENT_BINARY_DIR}/examples/TestVisual_examples.ipynb")  
+    
+  # Create a custom command to copy the file  
+  add_custom_command(  
+    TARGET ${PROJECT_NAME} POST_BUILD  
+    COMMAND ${CMAKE_COMMAND} -E copy ${SOURCE_FILE} ${DESTINATION_FILE}  
+    COMMENT "Copying jupyter notebook file to build directory"  
+    )  
+endif()
 
 install(FILES ${CMAKE_BINARY_DIR}/${SISL_PROJECT_NAME}-prefix/src/${SISL_PROJECT_NAME}/include/sisl.h DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
 install(FILES ${CMAKE_SOURCE_DIR}//sislnurbsgen.h DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
