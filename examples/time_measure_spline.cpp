@@ -50,7 +50,6 @@ int main() {
   }
 
   gen.PlotCurve("time_curve_points.txt", min_par, max_par, 10000);
-  gen.PlotCurvature("curvature.txt", min_par, max_par, 10000);
   gen.PlotCtrlPoints("time_controlpoints.txt");
 
   std::cout << "Create a spline by interpolation" << std::endl;
