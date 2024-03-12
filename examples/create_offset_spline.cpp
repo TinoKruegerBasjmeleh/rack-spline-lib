@@ -42,7 +42,6 @@ int main() {
   inter.PlotCurve("intercurve_points.txt", min_par, max_par, 50);
 
   inter.PlotCurvature("intercurvature.txt", min_par, max_par, 50);
-
   off.SetCurveParameter(4);
   point_2d dir{0, -1};
   off.CreateCurveByOffset(inter.GetSislCurve(), dir, -800);
