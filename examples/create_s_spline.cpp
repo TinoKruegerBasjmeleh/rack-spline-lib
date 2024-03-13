@@ -35,7 +35,7 @@ int main() {
 
   s_spline.PlotCurve("s_curve_points.txt", min_par, max_par, 50);
   s_spline.PlotCurvature("s_curvature.txt", min_par, max_par, 50);
-  s_spline.PlotCtrlPoints("controlpoints.txt");
+  s_spline.PlotCtrlPoints("s_controlpoints.txt");
 
   offset_neg.SetCurveParameter(4);
   point_2d dir{0, -1};

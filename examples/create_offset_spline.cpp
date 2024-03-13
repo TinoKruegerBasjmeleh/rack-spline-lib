@@ -47,6 +47,7 @@ int main() {
   min_par = inter.CalcMinParameterVal();
   off.PlotCurve("offcurve_points.txt", min_par, max_par, 50);
   off.PlotCurvature("offcurvature.txt", min_par, max_par, 50);
+  gen.PlotCtrlPoints("offctrlpoints.txt");
 
   return 0;
 }

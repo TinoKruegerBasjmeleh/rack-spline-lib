@@ -55,6 +55,7 @@ int main() {
   max_par = blended.CalcMaxParameterVal();
   min_par = blended.CalcMinParameterVal();
   blended.PlotCurve("blendedcurve_points.txt", min_par, max_par, 50);
+  blended.PlotCurvature("blendedcurvature.txt", min_par, max_par, 50);
 
   return 0;
 }
