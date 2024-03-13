@@ -39,7 +39,7 @@ int main() {
   max_par = inter.GetMaxParameterVal();
   min_par = inter.GetMinParameterVal();
   inter.PlotCurve("intercurve_points.txt", min_par, max_par, 50);
-
   inter.PlotCurvature("intercurvature.txt", min_par, max_par, 50);
+  gen.PlotCtrlPoints("interctrlpoints.txt");
   return 0;
 }
