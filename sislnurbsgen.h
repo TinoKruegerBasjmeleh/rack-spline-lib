@@ -298,6 +298,24 @@ class SislNurbsGen {
    */
   double     GetFullCordLength();
 
+  /**
+   * @brief SampAccurCordLeng
+   * To compute the length of the curve by sampling the curve
+   * at a given sampling rate : the bigger the sample rate the more accurate
+   * @param min_par
+   * @param max_par
+   * @param samples number of samples
+   * @return the computed length
+   */
+  double     SampAccurCordLeng(float min_par, float max_par, int samples);
+
+  /**
+   * @brief CalcCordLength
+   * To compute the length of the curve
+   * @return length of the curve
+   */
+  double     CalcCordLength();
+
   SISLCurve* GetSislCurve();
 
   SislNurbsGen();

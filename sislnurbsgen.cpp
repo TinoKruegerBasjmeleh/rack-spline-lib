@@ -619,8 +619,10 @@ double SislNurbsGen::GetMinParameterVal() {
   return min_par_val;
 }
 
+
 double SislNurbsGen::GetPartialCordLength(float min_par, float max_par,
                                           int samples) {
+
   float       length{};
   double      inc = (max_par - min_par) / samples;
   position_2d pos1{};
@@ -639,7 +641,9 @@ double SislNurbsGen::GetPartialCordLength(float min_par, float max_par,
   return double(length);
 }
 
+
 double SislNurbsGen::GetFullCordLength() {
+
   double epsge = 0.001;
   double length;
   int    stat = 0;
