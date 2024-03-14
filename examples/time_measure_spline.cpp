@@ -34,8 +34,8 @@ int main() {
   gen.SetCurveParameter(4);
   gen.CreateCurve();
 
-  float max_par = gen.CalcMaxParameterVal();
-  float min_par = gen.CalcMinParameterVal();
+  float max_par = gen.GetMaxParameterVal();
+  float min_par = gen.GetMinParameterVal();
 
   std::cout << "Max parameter: " << max_par << "\n" << std::endl;
   std::cout << "Min parameter: " << min_par << "\n" << std::endl;
@@ -61,8 +61,8 @@ int main() {
   inter.CreateCurveByInterpolation();
 
   auto stop     = high_resolution_clock::now();
-  max_par       = inter.CalcMaxParameterVal();
-  min_par       = inter.CalcMinParameterVal();
+  max_par       = inter.GetMaxParameterVal();
+  min_par       = inter.GetMinParameterVal();
 
   auto duration = duration_cast<milliseconds>(stop - start);
   std::cout << "Time taken by function: " << duration.count() << " milliseconds"

@@ -31,8 +31,8 @@ int main() {
   gen.SetCurveParameter(4);
   gen.CreateCurve();
 
-  float max_par = gen.CalcMaxParameterVal();
-  float min_par = gen.CalcMinParameterVal();
+  float max_par = gen.GetMaxParameterVal();
+  float min_par = gen.GetMinParameterVal();
 
   gen.PlotCurve("curve_points.txt", min_par, max_par, 50);
   gen.PlotCurvature("curvature.txt", min_par, max_par, 50);

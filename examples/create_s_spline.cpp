@@ -30,8 +30,8 @@ int main() {
   s_spline.SetCurveParameter(4);
   s_spline.CreateCurve();
 
-  float max_par = s_spline.CalcMaxParameterVal();
-  float min_par = s_spline.CalcMinParameterVal();
+  float max_par = s_spline.GetMaxParameterVal();
+  float min_par = s_spline.GetMinParameterVal();
 
   s_spline.PlotCurve("s_curve_points.txt", min_par, max_par, 50);
   s_spline.PlotCurvature("s_curvature.txt", min_par, max_par, 50);
@@ -40,8 +40,8 @@ int main() {
   offset_neg.SetCurveParameter(4);
   point_2d dir{0, -1};
   offset_neg.CreateCurveByOffset(s_spline.GetSislCurve(), dir, -800);
-  max_par = s_spline.CalcMaxParameterVal();
-  min_par = s_spline.CalcMinParameterVal();
+  max_par = s_spline.GetMaxParameterVal();
+  min_par = s_spline.GetMinParameterVal();
   offset_neg.PlotCurve("off_neg_curve.txt", min_par, max_par, 50);
   offset_neg.PlotCurvature("off_neg_curvature.txt", min_par, max_par, 50);
 
