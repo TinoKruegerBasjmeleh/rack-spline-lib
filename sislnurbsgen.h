@@ -172,16 +172,16 @@ class SislNurbsGen {
   }
 
  public:
-  int        SetCurveParameter(const int order, const int dim = 2);
-  int        SetCtrlPoints(const std::vector<point_2d> ctrl_points);
-  int        SetInterrogationPoints(const std::vector<point_2d>& points);
-  int        CreateCurve();
-  int        CreateCurveByInterpolation(const bool no_curvature_at_start = true,
-                                        const bool no_curvature_at_end = true);
-  int        CreateCurveByConstraintedInterpolation(double angle_start,
-                                                    double angle_end);
-  int        CreateCurveByOffset(SISLCurve* base, point_2d& dir, float offset);
-  int        CreateCurveByPathSegments(path_data* data);
+  int SetCurveParameter(const int order, const int dim = 2);
+  int SetCtrlPoints(const std::vector<point_2d> ctrl_points);
+  int SetInterrogationPoints(const std::vector<point_2d>& points);
+  int CreateCurve();
+  int CreateCurveByInterpolation(const bool no_curvature_at_start = true,
+                                 const bool no_curvature_at_end   = true);
+  int CreateCurveByConstraintedInterpolation(double angle_start,
+                                             double angle_end);
+  int CreateCurveByOffset(SISLCurve* base, point_2d& dir, float offset);
+  int CreateCurveByPathSegments(path_data* data);
 
   /**
    * @brief CreateCurveByBlendingCurves
@@ -196,17 +196,65 @@ class SislNurbsGen {
    * @param point_on_second point on the second curve
    * @return 0 for success, > 0 warning, < 0 error codes
    */
-  int        CreateCurveByBlendingCurves(SISLCurve* first, SISLCurve* second,
-                                         point_2d point_on_first,
-                                         point_2d point_on_second);
+  int CreateCurveByBlendingCurves(SISLCurve* first, SISLCurve* second,
+                                  point_2d point_on_first,
+                                  point_2d point_on_second);
 
-  int        PlotCurve(std::string filename, float min_par, float max_par,
-                       int samples = 100);
+  /**
+   * @brief CreateConnectedCurveByBlendingCurves
+   * To compute a blending curve between two curves. Two points indicate
+   * between which ends the blend is to be produced. The blending curve is
+   * either a circle or an approximated conic section if this is possible,
+   * other- wise it is a quadratic polynomial spline curve. The full curve
+   * starts at the start_point from the first curve and ends at the end_point at
+   * the last curve. The blend is create between the start_blended_crv and
+   * end_blended_crv. Be aware that the start_blended_crv and end_blended_crv
+   * are not the same as the start_point and end_point. The output is
+   * represented as a B-spline curve.
+   * @param first curve where the construction starts
+   * @param second curve where the construction ends
+   * @param start_point start point of the full curve
+   * @param start_blended_crv start point of the blend
+   * @param end_point end point of the full curve
+   * @param end_blended_crv end point of the blend
+   * @return success status
+   */
+  int CreateConnectedCurveByBlendingCurves(SISLCurve* first, SISLCurve* second,
+                                           point_2d start_point,
+                                           point_2d start_blended_crv,
+                                           point_2d end_point,
+                                           point_2d end_blended_crv);
 
-  int        PlotCtrlPoints(std::string filename);
+  /**
+   * @brief CreateCurveByCutAndBranching
+   * To compute  a curve by cutting two curves at a given point and branching
+   * them. The output is represented as a B-spline curve. The branching is done
+   * by represending the given point as parameter value for the first curve and
+   * the second curve. The first curve is then splitted at the given point and
+   * the second curve is splitted at the given point. The resulting curve is a
+   * connection from the first part of the first curve and second part of the
+   * second curve. Be aware that both curves should have a intersection point at
+   * the given point.
+   * @warning The function is not able to handle the case where the two curves
+   * are not intersecting.
+   * @param first curve
+   * @param second curve
+   * @param point_to_cut
+   * @param take_full_second_curve if true the full second curve is taken,
+   *                                otherwise the second curve is cut at the
+   * given point
+   * @return
+   */
+  int CreateCurveByCutAndBranching(SISLCurve* first, SISLCurve* second,
+                                   point_2d point_to_cut);
 
-  int        PlotCurvature(std::string filename, float min_par, float max_par,
-                           int samples);
+  int PlotCurve(std::string filename, float min_par, float max_par,
+                int samples = 100);
+
+  int PlotCtrlPoints(std::string filename);
+
+  int PlotCurvature(std::string filename, float min_par, float max_par,
+                    int samples);
   /**
    * @brief GetPosition
    * To compute the position based on the first derivatives of the curve at a
@@ -217,8 +265,8 @@ class SislNurbsGen {
    * orientation (default -> anti fork direction)
    * @return status messages > 0 : warning; = 0 : ok; < 0 : error
    */
-  int        GetPosition(const float par_val, position_2d& pos,
-                         const bool neg_x = true);
+  int GetPosition(const float par_val, position_2d& pos,
+                  const bool neg_x = true);
 
   /**
    * @brief GetCurvature
@@ -227,13 +275,13 @@ class SislNurbsGen {
    * @param curvature return value of the calculated curvature
    * @return
    */
-  int        GetCurvature(float par_val, double& curvature);
+  int GetCurvature(float par_val, double& curvature);
 
-  double     CalcMaxParameterVal();
-  double     CalcMinParameterVal();
+  double     GetMaxParameterVal();
+  double     GetMinParameterVal();
 
   /**
-   * @brief SampAccurCordLeng
+   * @brief GetPartialCordLength
    * To compute the length of the curve by sampling the curve
    * at a given sampling rate : the bigger the sample rate the more accurate
    * @param min_par
@@ -241,14 +289,14 @@ class SislNurbsGen {
    * @param samples number of samples
    * @return the computed length
    */
-  double     SampAccurCordLeng(float min_par, float max_par, int samples);
+  double     GetPartialCordLength(float min_par, float max_par, int samples);
 
   /**
-   * @brief CalcCordLength
+   * @brief GetFullCordLength
    * To compute the length of the curve
    * @return length of the curve
    */
-  double     CalcCordLength();
+  double     GetFullCordLength();
 
   SISLCurve* GetSislCurve();
 

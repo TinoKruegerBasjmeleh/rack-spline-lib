@@ -61,8 +61,8 @@ int main() {
   create_data();
   gen.SetCurveParameter(4);
   gen.CreateCurveByPathSegments(reinterpret_cast<path_data*>(&data));
-  min_par = gen.CalcMinParameterVal();
-  max_par = gen.CalcMaxParameterVal();
+  min_par = gen.GetMinParameterVal();
+  max_par = gen.GetMaxParameterVal();
   gen.PlotCurve("path_points.txt", min_par, max_par, 150);
   gen.PlotCurvature("path_curvature.txt", min_par, max_par, 150);
   position_2d start{}, end{};
