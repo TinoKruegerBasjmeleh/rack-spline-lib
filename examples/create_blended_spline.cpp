@@ -32,28 +32,34 @@ int main() {
   gen.SetCurveParameter(4);
   gen.CreateCurve();
 
-  float max_par = gen.CalcMaxParameterVal();
-  float min_par = gen.CalcMinParameterVal();
+  float max_par = gen.GetMaxParameterVal();
+  float min_par = gen.GetMinParameterVal();
 
   inter.SetInterrogationPoints(points);
   inter.SetCurveParameter(5);
   inter.CreateCurveByInterpolation();
-  max_par = inter.CalcMaxParameterVal();
-  min_par = inter.CalcMinParameterVal();
+  max_par = inter.GetMaxParameterVal();
+  min_par = inter.GetMinParameterVal();
+  inter.PlotCurve("intercurve_points.txt", min_par, max_par, 50);
+
+  inter.PlotCurvature("intercurvature.txt", min_par, max_par, 50);
 
   off.SetCurveParameter(4);
   point_2d dir{0, -1};
   off.CreateCurveByOffset(inter.GetSislCurve(), dir, -800);
-  max_par = off.CalcMaxParameterVal();
-  min_par = off.CalcMinParameterVal();
+  max_par = off.GetMaxParameterVal();
+  min_par = off.GetMinParameterVal();
+  off.PlotCurve("offcurve_points.txt", min_par, max_par, 50);
+
+  off.PlotCurvature("offcurvature.txt", min_par, max_par, 50);
 
   point_2d origin{50, 940};
   point_2d offset{846, 5620};
   blended.SetCurveParameter(4);
   blended.CreateCurveByBlendingCurves(inter.GetSislCurve(), off.GetSislCurve(),
                                       origin, offset);
-  max_par = blended.CalcMaxParameterVal();
-  min_par = blended.CalcMinParameterVal();
+  max_par = blended.GetMaxParameterVal();
+  min_par = blended.GetMinParameterVal();
   blended.PlotCurve("blendedcurve_points.txt", min_par, max_par, 50);
   blended.PlotCurvature("blendedcurvature.txt", min_par, max_par, 50);
 

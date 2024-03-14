@@ -192,3 +192,26 @@ target_link_libraries(${CORD_LENGTH}
 set_target_properties(${CORD_LENGTH} PROPERTIES
                       CXX_STANDARD 17
                       CXX_EXTENSIONS OFF)
+
+#------ blended curve
+#------ add new function to generate a blended spline based two given splines
+
+set(BLENDED_FULL "create_blended_full")
+set(SOURCES_BLENDED_FULL
+      create_blended_full_spline.cpp
+   )
+add_executable(${BLENDED_FULL} ${SOURCES_BLENDED_FULL})
+target_include_directories(${BLENDED_FULL} PUBLIC
+                           ${CMAKE_SOURCE_DIR}
+                           ${CMAKE_BINARY_DIR}/${SISL_PROJECT_NAME}-prefix/src/${SISL_PROJECT_NAME}/include
+                           ${CMAKE_INSTALL_PREFIX}/include/rack
+                            )
+target_link_libraries(${BLENDED_FULL}
+                      "${CMAKE_BINARY_DIR}/librack-spline.a"
+                      "${CMAKE_BINARY_DIR}/sisl_lib-prefix/src/sisl_lib-build/libsisl.a"
+                      )
+
+
+set_target_properties(${BLENDED_FULL} PROPERTIES
+                      CXX_STANDARD 17
+                      CXX_EXTENSIONS OFF )
