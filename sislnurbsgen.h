@@ -172,16 +172,16 @@ class SislNurbsGen {
   }
 
  public:
-  int        SetCurveParameter(const int order, const int dim = 2);
-  int        SetCtrlPoints(const std::vector<point_2d> ctrl_points);
-  int        SetInterrogationPoints(const std::vector<point_2d>& points);
-  int        CreateCurve();
-  int        CreateCurveByInterpolation(const bool no_curvature_at_start = true,
-                                        const bool no_curvature_at_end = true);
-  int        CreateCurveByConstraintedInterpolation(double angle_start,
-                                                    double angle_end);
-  int        CreateCurveByOffset(SISLCurve* base, point_2d& dir, float offset);
-  int        CreateCurveByPathSegments(path_data* data);
+  int SetCurveParameter(const int order, const int dim = 2);
+  int SetCtrlPoints(const std::vector<point_2d> ctrl_points);
+  int SetInterrogationPoints(const std::vector<point_2d>& points);
+  int CreateCurve();
+  int CreateCurveByInterpolation(const bool no_curvature_at_start = true,
+                                 const bool no_curvature_at_end   = true);
+  int CreateCurveByConstraintedInterpolation(double angle_start,
+                                             double angle_end);
+  int CreateCurveByOffset(SISLCurve* base, point_2d& dir, float offset);
+  int CreateCurveByPathSegments(path_data* data);
 
   /**
    * @brief CreateCurveByBlendingCurves
@@ -196,9 +196,9 @@ class SislNurbsGen {
    * @param point_on_second point on the second curve
    * @return 0 for success, > 0 warning, < 0 error codes
    */
-  int        CreateCurveByBlendingCurves(SISLCurve* first, SISLCurve* second,
-                                         point_2d point_on_first,
-                                         point_2d point_on_second);
+  int CreateCurveByBlendingCurves(SISLCurve* first, SISLCurve* second,
+                                  point_2d point_on_first,
+                                  point_2d point_on_second);
 
   /**
    * @brief CreateConnectedCurveByBlendingCurves
@@ -248,13 +248,13 @@ class SislNurbsGen {
   int CreateCurveByCutAndBranching(SISLCurve* first, SISLCurve* second,
                                    point_2d point_to_cut);
 
-  int        PlotCurve(std::string filename, float min_par, float max_par,
-                       int samples = 100);
+  int PlotCurve(std::string filename, float min_par, float max_par,
+                int samples = 100);
 
-  int        PlotCtrlPoints(std::string filename);
+  int PlotCtrlPoints(std::string filename);
 
-  int        PlotCurvature(std::string filename, float min_par, float max_par,
-                           int samples);
+  int PlotCurvature(std::string filename, float min_par, float max_par,
+                    int samples);
   /**
    * @brief GetPosition
    * To compute the position based on the first derivatives of the curve at a
@@ -265,8 +265,8 @@ class SislNurbsGen {
    * orientation (default -> anti fork direction)
    * @return status messages > 0 : warning; = 0 : ok; < 0 : error
    */
-  int        GetPosition(const float par_val, position_2d& pos,
-                         const bool neg_x = true);
+  int GetPosition(const float par_val, position_2d& pos,
+                  const bool neg_x = true);
 
   /**
    * @brief GetCurvature
@@ -275,7 +275,7 @@ class SislNurbsGen {
    * @param curvature return value of the calculated curvature
    * @return
    */
-  int        GetCurvature(float par_val, double& curvature);
+  int GetCurvature(float par_val, double& curvature);
 
   double     GetMaxParameterVal();
   double     GetMinParameterVal();
