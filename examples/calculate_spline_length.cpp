@@ -31,8 +31,8 @@ int main() {
 
   float  min_par = spline.GetMinParameterVal();
   float  max_par = spline.GetMaxParameterVal();
-  double length  = spline.GetFullCordLength();
 
+  double length  = spline.GetFullCordLength();
   std::cout << "Spline length is: " << length << " mm" << std::endl;
 
   spline.PlotCurve("s_curve_points.txt", min_par, max_par, 100);

@@ -95,10 +95,10 @@ int SislNurbsGen::CreateCurve() {
 
 int SislNurbsGen::CreateCurveByConstraintedInterpolation(double angle_start,
                                                          double angle_end) {
-  double    cendpar;
-  double*   gpar = 0;
-  int       jnbpar;
-  int       jstat = 0;
+  double  cendpar;
+  double* gpar = 0;
+  int     jnbpar;
+  int     jstat = 0;
 
   // add constraints at the start and end of the curve
   SislPoint p{};
@@ -559,7 +559,7 @@ int SislNurbsGen::GetPosition(const float par_val, position_2d& pos,
   int    stat{};
   double add_pi = neg_x ? M_PI : 0;
 
-  pos           = {};
+  pos = {};
   if (!is_created_) {
     return EOPNOTSUPP;
   }

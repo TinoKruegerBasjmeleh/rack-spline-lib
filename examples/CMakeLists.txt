@@ -193,7 +193,7 @@ set_target_properties(${CORD_LENGTH} PROPERTIES
                       CXX_STANDARD 17
                       CXX_EXTENSIONS OFF)
 
-#------ blended full curve
+#------ blended curve
 #------ add new function to generate a blended spline based two given splines
 
 set(BLENDED_FULL "create_blended_full")
