@@ -649,6 +649,14 @@ double SislNurbsGen::GetFullCordLength() {
 
 SISLCurve* SislNurbsGen::GetSislCurve() { return curve_; }
 
+int        SislNurbsGen::SetSislCurve(SISLCurve* curve) {
+  if (curve_) {
+    freeCurve(curve_);
+  }
+  curve_ = copyCurve(curve);
+  return 0;
+}
+
 SislNurbsGen::SislNurbsGen() {
   ctrl_.reserve(PATH_SPLINE_MAX);
   points_.reserve(PATH_SPLINE_MAX);

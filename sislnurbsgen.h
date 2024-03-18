@@ -300,6 +300,8 @@ class SislNurbsGen {
 
   SISLCurve* GetSislCurve();
 
+  int        SetSislCurve(SISLCurve* curve);
+
   SislNurbsGen();
   ~SislNurbsGen();
 };
