@@ -77,5 +77,14 @@ int main() {
   min_par = cutnbranch.GetMinParameterVal();
   cutnbranch.PlotCurve("cutnbranch_points.txt", min_par, max_par, 50);
 
+  double var{};
+
+  off.GetPosition(off.GetMinParameterVal() + 0.8 * param_range, pos);
+  cutnbranch.GetPoseRelSplineParVal(pos, var);
+  std::cout << "Pose relative to spline parameter value where blending ends: "
+            << var
+            << " max parameter value: " << cutnbranch.GetMaxParameterVal()
+            << std::endl;
+
   return 0;
 }

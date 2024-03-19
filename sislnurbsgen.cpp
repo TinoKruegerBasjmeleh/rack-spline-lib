@@ -657,6 +657,25 @@ int        SislNurbsGen::SetSislCurve(SISLCurve* curve) {
   return 0;
 }
 
+int SislNurbsGen::GetPoseRelSplineParVal(position_2d& pos, double& par_val) {
+  double    dist{};
+  int       stat{};
+
+  SislPoint p_to_find{static_cast<double>(pos.x), static_cast<double>(pos.y)};
+
+  double    epsge = 1.0e-6;  // geometric precision
+
+  s1957(curve_,
+        reinterpret_cast<double*>(&p_to_find),  // startpoint of curve 1
+                                                // (geometric)
+        param_.dim, 1.0e-9, epsge, &par_val, &dist, &stat);
+
+  if (stat < 0) {
+    par_val = 0.0;
+  }
+  return stat;
+}
+
 SislNurbsGen::SislNurbsGen() {
   ctrl_.reserve(PATH_SPLINE_MAX);
   points_.reserve(PATH_SPLINE_MAX);
