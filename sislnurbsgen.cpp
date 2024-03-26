@@ -511,6 +511,24 @@ int SislNurbsGen::CreateCurveByPathSegments(path_data* data) {
   return CreateCurveByInterpolation();
 }
 
+int SislNurbsGen::CreateCurveByPathSegments(polar_spline* spline, int num_splines) {
+  points_.clear();
+  points_type_.clear();
+
+  for (int i = 0; i < num_splines; i++) {
+    points_.push_back({static_cast<double>(spline[i].startPos.x),
+                       static_cast<double>(spline[i].startPos.y)});
+    points_type_.push_back(1);
+  }
+  // take care of the last point
+  points_.push_back(
+      {static_cast<double>(spline[num_splines - 1].endPos.x),
+       static_cast<double>(spline[num_splines - 1].endPos.y)});
+  points_type_.push_back(1);
+
+  return CreateCurveByInterpolation();
+}
+
 int SislNurbsGen::PlotCtrlPoints(std::string filename) {
   std::ofstream out(filename, std::ios::trunc | std::ios::out);
 
