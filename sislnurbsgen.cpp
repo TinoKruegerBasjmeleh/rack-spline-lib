@@ -237,7 +237,7 @@ int SislNurbsGen::CreateCurveByBlendingCurves(SISLCurve* first,
                                                  // (geometric)
         param_.dim, 1.0e-9, epsge, &var_par_first, &dist_first, &stat);
 
-  if (stat != 0) {
+  if (stat < 0) {
     return stat;
   }
 
@@ -249,7 +249,7 @@ int SislNurbsGen::CreateCurveByBlendingCurves(SISLCurve* first,
                                                   // (geometric)
         param_.dim, 1.0e-9, epsge, &var_par_second, &dist_second, &stat);
 
-  if (stat != 0) {
+  if (stat < 0) {
     return stat;
   }
 
@@ -261,10 +261,19 @@ int SislNurbsGen::CreateCurveByBlendingCurves(SISLCurve* first,
 
   s1710(first, var_par_first, &first_loc_1, &first_loc_2, &stat);
 
+  if (stat < 0) {
+    return stat;
+  }
+
   if (first_loc_2) {
     freeCurve(first_loc_2);
   }
+
   s1710(second, var_par_second, &second_loc_1, &second_loc_2, &stat);
+
+  if (stat < 0) {
+    return stat;
+  }
 
   if (second_loc_1) {
     freeCurve(second_loc_1);
@@ -286,7 +295,9 @@ int SislNurbsGen::CreateCurveByBlendingCurves(SISLCurve* first,
         &curve_,       // the generated curve
         &stat);        // status message
 
-  is_created_ = true;
+  if (stat > 0) {
+    is_created_ = true;
+  }
   freeCurve(first_loc_1);
   freeCurve(second_loc_2);
   return stat;
