@@ -182,6 +182,7 @@ class SislNurbsGen {
                                              double angle_end);
   int CreateCurveByOffset(SISLCurve* base, point_2d& dir, float offset);
   int CreateCurveByPathSegments(path_data* data);
+  int CreateCurveByPathSegments(polar_spline* spline, int num_splines);
 
   /**
    * @brief CreateCurveByBlendingCurves
