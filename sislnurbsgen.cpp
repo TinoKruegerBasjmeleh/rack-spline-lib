@@ -399,7 +399,7 @@ int SislNurbsGen::CreateConnectedCurveByBlendingCurves(
   double var_par_second_start{};
   double var_par_second_end{};
   double dist_second{};
-  s1957(first,
+  s1957(second,
         reinterpret_cast<double*>(&ep_on_blended),  // startpoint of curve 2
                                                     // (geometric)
         param_.dim, 1.0e-9, epsge, &var_par_second_start, &dist_second,
@@ -408,7 +408,7 @@ int SislNurbsGen::CreateConnectedCurveByBlendingCurves(
   if (err_num_ < 0) {
     return err_num_;
   }
-  s1957(first,
+  s1957(second,
         reinterpret_cast<double*>(&ep_on_second),  // endpoint of curve 2
                                                    // (geometric)
         param_.dim, 1.0e-9, epsge, &var_par_second_end, &dist_second,
