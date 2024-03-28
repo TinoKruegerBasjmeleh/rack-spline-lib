@@ -22,6 +22,7 @@ int main() {
 
   SislNurbsGen          gen;
   SislNurbsGen          inter;
+  SislNurbsGen          approx;
 
   std::vector<point_2d> points{
       {0, 0}, {0, 1000}, {0, 6000}, {5000, 6000}, {6000, 6000}};
@@ -34,12 +35,21 @@ int main() {
   float min_par = gen.GetMinParameterVal();
 
   inter.SetInterrogationPoints(points);
-  inter.SetCurveParameter(5);
+  inter.SetCurveParameter(4);
   inter.CreateCurveByInterpolation();
   max_par = inter.GetMaxParameterVal();
   min_par = inter.GetMinParameterVal();
   inter.PlotCurve("intercurve_points.txt", min_par, max_par, 50);
   inter.PlotCurvature("intercurvature.txt", min_par, max_par, 50);
   gen.PlotCtrlPoints("interctrlpoints.txt");
+
+  approx.SetInterrogationPoints(points);
+  approx.SetCurveParameter(4);
+  approx.CreateCurveByApproximation();
+  max_par = approx.GetMaxParameterVal();
+  min_par = approx.GetMinParameterVal();
+  approx.PlotCurve("approxcurve_points.txt", min_par, max_par, 50);
+  approx.PlotCurvature("approxcurvature.txt", min_par, max_par, 50);
+
   return 0;
 }
