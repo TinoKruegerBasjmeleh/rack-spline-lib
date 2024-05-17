@@ -627,8 +627,8 @@ double SislNurbsGen::GetPartialCordLength(float min_par, float max_par,
   position_2d pos2{};
 
   GetPosition(min_par, pos1);
-  for (float f = min_par + inc ; f <= max_par; f += inc) {
-    GetPosition(f , pos2);
+  for (float f = min_par + inc; f <= max_par; f += inc) {
+    GetPosition(f, pos2);
     length += CalcDist(pos1, pos2);
     pos1 = pos2;
   }
