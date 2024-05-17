@@ -25,10 +25,11 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <unordered_map>
 
 class CurveParameter {
  public:
-  int order{4};  /// order of spline curve (degree + 1)
+  int order{6};  /// order of spline curve (degree + 1)
   int kind{1};   /// kind = polynomial B-spline curve
   int dim{2};    /// dimension
   CurveParameter() {}
@@ -39,6 +40,145 @@ class SislNurbsGen {
     double x{};
     double y{};
   };
+
+  std::unordered_map<int, std::string> err_map{
+      {-101, "RackSplErr: -101 Error in memory allocation."},
+      {-102, "RackSplErr: -102 Error in input. Dimension less than 1."},
+      {-103, "RackSplErr: -103 Error in input. Dimension less than 2."},
+      {-104, "RackSplErr: -104 Error in input. Dimension not equal 3."},
+      {-105, "RackSplErr: -105 Error in input. Dimension not equal 2 or 3."},
+      {-106, "RackSplErr: -106 Error in input. Conflicting dimensions."},
+      {-107, "RackSplErr: -107 Unknown error."},
+      {-108, "RackSplErr: -108 Error in input. Dimension not equal 2."},
+      {-109, "RackSplErr: -109 Error in input. Order less than 2."},
+      {-110, "RackSplErr: -110 Error in Curve description. Order less than 1."},
+      {-111,
+       "RackSplErr: -111 Error in Curve description. Number of vertices less "
+       "than order."},
+      {-112,
+       "RackSplErr: -112 Error in Curve description. Error in knot vector."},
+      {-113,
+       "RackSplErr: -113 Error in Curve description. Unknown kind of Curve."},
+      {-114,
+       "RackSplErr: -114 Error in Curve description. Open Curve when expecting "
+       "closed."},
+      {-115, "RackSplErr: -115 Error in Surf description. Order less than 1."},
+      {-116,
+       "RackSplErr: -116 Error in Surf description. Number of vertices less "
+       "than order."},
+      {-117,
+       "RackSplErr: -117 Error in Surf description. Error in knot vector."},
+      {-118,
+       "RackSplErr: -118 Error in Surf description. Unknown kind of Surf."},
+      {-119, "RackSplErr: -119 Unknown error."},
+      {-120, "RackSplErr: -120 Error in input. Negative relative tolerance."},
+      {-121, "RackSplErr: -121 Error in input. Unknown kind of Object."},
+      {-122,
+       "RackSplErr: -122 Error in input. Unexpected kind of Object found."},
+      {-123,
+       "RackSplErr: -123 Error in input. Parameter direction does not exist."},
+      {-124,
+       "RackSplErr: -124 Error in input. Zero length parameter interval."},
+      {-125, "RackSplErr: -125 Unknown error."},
+      {-126, "RackSplErr: -126 Unknown error."},
+      {-127, "RackSplErr: -127 Error in input. The whole curve lies on axis."},
+      {-128, "RackSplErr: -128 Unkown error."},
+      {-129, "RackSplErr: -129 Unknown error."},
+      {-130,
+       "RackSplErr: -130 Error in input. Parameter value is outside parameter "
+       "area."},
+      {-131, "RackSplErr: -131 Unknown error."},
+      {-132, "RackSplErr: -132 Unknown error."},
+      {-133, "RackSplErr: -133 Unknown error."},
+      {-134, "RackSplErr: -134 Unknown error."},
+      {-135,
+       "RackSplErr: -135 Error in data structure. Intersection point exists "
+       "when it should not."},
+      {-136,
+       "RackSplErr: -136 Error in data structure. Intersection list exists "
+       "when it should not."},
+      {-137,
+       "RackSplErr: -137 Error in data structure. Expected intersection point "
+       "not found."},
+      {-138,
+       "RackSplErr: -138 Error in data structure. Wrong number of "
+       "intersections on edges/endpoints."},
+      {-139, "RackSplErr: -139 Error in data structure."},
+      {-140,
+       "RackSplErr: -140 Error in data structure. Intersection interval "
+       "crosses subdivision line when not expected to."},
+      {-141, "RackSplErr: -141 Error in input. Illegal edge point requested."},
+      {-142, "RackSplErr: -142 Unknown error"},
+      {-143, "RackSplErr: -143 Unknown error"},
+      {-144, "RackSplErr: -144 Unknown kind of intersection curve."},
+      {-145,
+       "RackSplErr: -145 Unknown kind of intersection list (internal format)."},
+      {-146, "RackSplErr: -146 Unknown kind of intersection type."},
+      {-147, "RackSplErr: -147 Unknown error"},
+      {-148, "RackSplErr: -148 Unknown error"},
+      {-149, "RackSplErr: -149 Unknown error"},
+      {-150, "RackSplErr: -150 Error in input. NULL pointer was given."},
+      {-151,
+       "RackSplErr: -151 Error in input. One or more illegal input values."},
+      {-152, "RackSplErr: -152 Too many knots to insert."},
+      {-153,
+       "RackSplErr: -153 Lower level routine reported error. SHOULD use label "
+       "\"error\"."},
+      {-154, "RackSplErr: -154 Unknown error"},
+      {-155, "RackSplErr: -155 Unknown error"},
+      {-156, "RackSplErr: -156 Unknown error"},
+      {-157,
+       "RackSplErr: -157 Illegal derivative requested. Change this label to "
+       "err178."},
+      {-158, "RackSplErr: -158 Intersection point outside Curve."},
+      {-159,
+       "RackSplErr: -159 No of vertices less than 1. SHOULD USE err111 or "
+       "err116."},
+      {-160, "RackSplErr: -160 Error in dimension of interpolation problem."},
+      {-161, "RackSplErr: -161 Error in interpolation problem."},
+      {-162, "RackSplErr: -162 Matrix may be noninvertible."},
+      {-163, "RackSplErr: -163 Matrix part contains diagonal elements."},
+      {-164,
+       "RackSplErr: -164 No point conditions specified in interpolation "
+       "problem."},
+      {-165, "RackSplErr: -165 Error in interpolation problem."},
+      {-166, "RackSplErr: -166 Unknown error"},
+      {-167, "RackSplErr: -167 Unknown error"},
+      {-168, "RackSplErr: -168 Unknown error"},
+      {-169, "RackSplErr: -169 Unknown error"},
+      {-170, "RackSplErr: -170 Internal error: Error in moving knot values."},
+      {-171,
+       "RackSplErr: -171 Memory allocation failure: Could not create curve or "
+       "surface."},
+      {-172, "RackSplErr: -172 Input error, inarr < 1 || inarr > 3."},
+      {-173, "RackSplErr: -173 Direction vector zero length."},
+      {-174, "RackSplErr: -174 Degenerate condition."},
+      {-175, "RackSplErr: -175 Unknown degree/type of implicit surface."},
+      {-176, "RackSplErr: -176 Unexpected iteration situation."},
+      {-177,
+       "RackSplErr: -177 Error in input. Negative step length requested."},
+      {-178, "RackSplErr: -178 Illegal derivative requested."},
+      {-179, "RackSplErr: -179 No. of Curves < 2."},
+      {-180, "RackSplErr: -180 Error in torus description."},
+      {-181, "RackSplErr: -181 Too few points as input."},
+      {-182, "RackSplErr: -182 Unknown error"},
+      {-183, "RackSplErr: -183 Order(s) specified to low."},
+      {-184, "RackSplErr: -184 Negative tolerance given."},
+      {-185, "RackSplErr: -185 Only degenerate or singular guide points."},
+      {-186, "RackSplErr: -186 Special error in traversal of curves."},
+      {-187, "RackSplErr: -187 Error in description of input curves."},
+      {-188, "RackSplErr: -188 Unknown error"},
+      {-189, "RackSplErr: -189 Unknown error"},
+      {-190, "RackSplErr: -190 Too small array for storing Curve segments."},
+      {-191, "RackSplErr: -191 Error in inserted parameter number."},
+      {-192, "RackSplErr: -192 Unknown error"},
+      {-193, "RackSplErr: -193 Unknown error"},
+      {-194, "RackSplErr: -194 Unknown error"},
+      {-195, "RackSplErr: -195 Unknown error"},
+      {-196, "RackSplErr: -196 Unknown error"},
+      {-197, "RackSplErr: -197 Unknown error"},
+      {-198, "RackSplErr: -198 Unknown error"},
+      {-199, "RackSplErr: -199 Unknown error"}};
 
  private:
   CurveParameter         param_{};
@@ -54,6 +194,15 @@ class SislNurbsGen {
   bool                   knots_created = false;
   bool                   params_set    = false;
   bool                   is_created_   = false;
+  int                    err_num_      = 0;
+
+  enum DISTANCETYPE { EUCLIDEAN = 0, MANHATTAN = 1 };
+  static constexpr float kDivZeroPrevention = 0.46e-9;  //>to prevent an
+                                                        // division through
+                                                        // zero, this is the
+                                                        // proving value
+                                                        // 1/(2^31) floating
+                                                        // point mapping
 
   enum DISTANCETYPE { EUCLIDEAN = 0, MANHATTAN = 1 };
   static constexpr float kDivZeroPrevention = 0.46e-9;  //>to prevent an
@@ -172,9 +321,17 @@ class SislNurbsGen {
   }
 
  public:
+<<<<<<< HEAD
   int SetCurveParameter(const int order, const int dim = 2);
   int SetCtrlPoints(const std::vector<point_2d> ctrl_points);
   int SetInterrogationPoints(const std::vector<point_2d>& points);
+=======
+  std::vector<point_2d> inter_points;  // interrogation points
+  int SetCurveParameter(const int order, const int dim = 2);
+  int SetCtrlPoints(const std::vector<point_2d> ctrl_points);
+  int SetInterrogationPoints(const std::vector<point_2d>& points);
+  int SetInterrogationPoints() { return SetInterrogationPoints(inter_points); }
+>>>>>>> 647feb901ae1909056793f09317391d83714347f
   int CreateCurve();
   int CreateCurveByInterpolation(const bool no_curvature_at_start = true,
                                  const bool no_curvature_at_end   = true);
@@ -182,6 +339,12 @@ class SislNurbsGen {
                                              double angle_end);
   int CreateCurveByOffset(SISLCurve* base, point_2d& dir, float offset);
   int CreateCurveByPathSegments(path_data* data);
+<<<<<<< HEAD
+=======
+  int CreateCurveByPathSegments(polar_spline* spline, int num_splines);
+
+  int CreateCurveByApproximation();
+>>>>>>> 647feb901ae1909056793f09317391d83714347f
 
   /**
    * @brief CreateCurveByBlendingCurves
@@ -194,11 +357,23 @@ class SislNurbsGen {
    * @param second  pointer to an existing SislCurve
    * @param point_on_first point on an first curve
    * @param point_on_second point on the second curve
+   * @param result  pointer to the resulting SislCurve
    * @return 0 for success, > 0 warning, < 0 error codes
    */
   int CreateCurveByBlendingCurves(SISLCurve* first, SISLCurve* second,
                                   point_2d point_on_first,
+<<<<<<< HEAD
                                   point_2d point_on_second);
+=======
+                                  point_2d point_on_second, SISLCurve** result);
+
+  int CreateCurveByBlendingCurves(SISLCurve* first, SISLCurve* second,
+                                  point_2d point_on_first,
+                                  point_2d point_on_second) {
+    return CreateCurveByBlendingCurves(first, second, point_on_first,
+                                       point_on_second, &curve_);
+  }
+>>>>>>> 647feb901ae1909056793f09317391d83714347f
 
   /**
    * @brief CreateConnectedCurveByBlendingCurves
@@ -224,6 +399,7 @@ class SislNurbsGen {
                                            point_2d start_blended_crv,
                                            point_2d end_point,
                                            point_2d end_blended_crv);
+<<<<<<< HEAD
 
   /**
    * @brief CreateCurveByCutAndBranching
@@ -253,6 +429,39 @@ class SislNurbsGen {
 
   int PlotCtrlPoints(std::string filename);
 
+=======
+
+  /**
+   * @brief CreateCurveByCutAndBranching
+   * To compute  a curve by cutting two curves at a given point and branching
+   * them. The output is represented as a B-spline curve. The branching is done
+   * by represending the given point as parameter value for the first curve and
+   * the second curve. The first curve is then splitted at the given point and
+   * the second curve is splitted at the given point. The resulting curve is a
+   * connection from the first part of the first curve and second part of the
+   * second curve. Be aware that both curves should have a intersection point at
+   * the given point.
+   * @warning The function is not able to handle the case where the two curves
+   * are not intersecting.
+   * @param first curve
+   * @param second curve
+   * @param point_to_cut
+   * @param take_full_second_curve if true the full second curve is taken,
+   *                                otherwise the second curve is cut at the
+   * given point
+   * @return
+   */
+  int CreateCurveByCutAndBranching(SISLCurve* first, SISLCurve* second,
+                                   point_2d point_to_cut);
+
+  bool IsCreated();
+
+  int PlotCurve(std::string filename, float min_par, float max_par,
+                int samples = 100);
+
+  int PlotCtrlPoints(std::string filename);
+
+>>>>>>> 647feb901ae1909056793f09317391d83714347f
   int PlotCurvature(std::string filename, float min_par, float max_par,
                     int samples);
   /**
@@ -276,6 +485,7 @@ class SislNurbsGen {
    * @return
    */
   int GetCurvature(float par_val, double& curvature);
+<<<<<<< HEAD
 
   double     GetMaxParameterVal();
   double     GetMinParameterVal();
@@ -291,6 +501,32 @@ class SislNurbsGen {
    */
   double     GetPartialCordLength(float min_par, float max_par, int samples);
 
+=======
+
+  double     GetMaxParameterVal();
+  double     GetMinParameterVal();
+
+  /**
+   * @brief GetPoseRelSplineParVal
+   * To compute the parameter value of the curve at a given position.
+   * @param pos - the position to be evaluated
+   * @param par_val - the parameter value of the curve at the given position
+   * @return success status
+   */
+  int        GetPoseRelSplineParVal(position_2d& pos, double& par_val);
+
+  /**
+   * @brief GetPartialCordLength
+   * To compute the length of the curve by sampling the curve
+   * at a given sampling rate : the bigger the sample rate the more accurate
+   * @param min_par
+   * @param max_par
+   * @param samples number of samples
+   * @return the computed length
+   */
+  double     GetPartialCordLength(float min_par, float max_par, int samples);
+
+>>>>>>> 647feb901ae1909056793f09317391d83714347f
   /**
    * @brief GetFullCordLength
    * To compute the length of the curve
@@ -299,6 +535,21 @@ class SislNurbsGen {
   double     GetFullCordLength();
 
   SISLCurve* GetSislCurve();
+
+  int        SetSislCurve(SISLCurve* curve);
+  void        Reset();
+
+  std::string GetErrorString() {
+    if (err_num_ == 0) {
+      return "No error";
+    } else if (err_num_ > 0) {
+      return "Warning";
+    } else if (err_map.find(err_num_) == err_map.end()) {
+      return "Unknown error";
+    }
+
+    return err_map[err_num_];
+  }
 
   SislNurbsGen();
   ~SislNurbsGen();

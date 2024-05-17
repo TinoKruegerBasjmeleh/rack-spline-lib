@@ -71,6 +71,7 @@ int SislNurbsGen::CreateCurve() {
     freeCurve(curve_);
   }
 
+  is_created_ = false;
   if (knots_.size()) {
     curve_ = newCurve(ctrl_.size(),   // number of control points
                       param_.order,   // order of spline curve (degree (p) + 1)
@@ -81,15 +82,17 @@ int SislNurbsGen::CreateCurve() {
                                                                 // vector
                                                                 // (control
                                                                 // points)
-                      1,   // kind = polynomial B-spline curve
-                      2,   // dimension
-                      0);  // no copying of information, 'borrow' arrays
-  }
-  if (!curve_) {
-    return -ENODATA;
+                      1,           // kind = polynomial B-spline curve
+                      param_.dim,  // dimension
+                      1);          // no copying of information, 'borrow' arrays
   }
 
-  is_created_ = true;
+  if (!curve_) {
+    return -ENODATA;
+  } else {
+    is_created_ = true;
+  }
+
   return 0;
 }
 
@@ -98,7 +101,10 @@ int SislNurbsGen::CreateCurveByConstraintedInterpolation(double angle_start,
   double    cendpar;
   double*   gpar = 0;
   int       jnbpar;
+<<<<<<< HEAD
   int       jstat = 0;
+=======
+>>>>>>> 647feb901ae1909056793f09317391d83714347f
 
   // add constraints at the start and end of the curve
   SislPoint p{};
@@ -112,6 +118,9 @@ int SislNurbsGen::CreateCurveByConstraintedInterpolation(double angle_start,
   if (curve_) {
     freeCurve(curve_);
   }
+
+  is_created_ = false;
+
   s1356(reinterpret_cast<double*>(points_.data()),  // pointer to where the
                                                     // point coordinates are
                                                     // stored
@@ -129,21 +138,25 @@ int SislNurbsGen::CreateCurveByConstraintedInterpolation(double angle_start,
         &gpar,     // pointer to the parameter values of the points in the curve
                    // (to be determined)
         &jnbpar,   // number of unique parameter values (to be determined)
-        &jstat);   // status message
+        &err_num_);  // status message
 
-  is_created_ = true;
+  if (err_num_ >= 0) {
+    is_created_ = true;
+  }
 
-  return jstat;
+  return err_num_;
 }
 int SislNurbsGen::CreateCurveByOffset(SISLCurve* base, point_2d& dir,
                                       float offset) {
   double    epsge = 1.0e-5;  // geometric tolerance
-  int       stat{};
   SislPoint d{static_cast<double>(dir.x), static_cast<double>(dir.y)};
 
   if (curve_) {
     freeCurve(curve_);
   }
+
+  is_created_ = false;
+
   s1360(base,                           // the 'old' curve
         offset,                         // the offset value
         epsge,                          // geometric tolerance
@@ -151,10 +164,13 @@ int SislNurbsGen::CreateCurveByOffset(SISLCurve* base, point_2d& dir,
         0,  // max step length.  0 indicate the longest box side of 's1'
         param_.dim,  // the dimension
         &curve_,     // the resulting offset curve
-        &stat);      // status variable
-  is_created_ = true;
+        &err_num_);  // status variable
 
-  return stat;
+  if (err_num_ >= 0) {
+    is_created_ = true;
+  }
+
+  return err_num_;
 }
 
 int SislNurbsGen::CreateCurveByInterpolation(const bool no_curvature_at_start,
@@ -162,11 +178,13 @@ int SislNurbsGen::CreateCurveByInterpolation(const bool no_curvature_at_start,
   double  cendpar;
   double* gpar = 0;
   int     jnbpar;
-  int     jstat = 0;
 
   if (curve_) {
     freeCurve(curve_);
   }
+
+  is_created_ = false;
+
   s1356(reinterpret_cast<double*>(points_.data()),  // pointer to where the
                                                     // point coordinates are
                                                     // stored
@@ -186,12 +204,35 @@ int SislNurbsGen::CreateCurveByInterpolation(const bool no_curvature_at_start,
         &gpar,     // pointer to the parameter values of the points in the curve
                    // (to be determined)
         &jnbpar,   // number of unique parameter values (to be determined)
-        &jstat);   // status message
+        &err_num_);  // status message
 
-  is_created_ = true;
-
-  return jstat;
+  if (err_num_ >= 0) {
+    is_created_ = true;
+  }
+  return err_num_;
 }
+
+int SislNurbsGen::CreateCurveByApproximation() {
+  double cendpar;
+  double gpar = 0;
+  int    jnbpar;
+
+  if (curve_) {
+    freeCurve(curve_);
+  }
+  is_created_ = false;
+
+  s1630(reinterpret_cast<double*>(points_.data()),  // pointer to where the
+                                                    // point coordinates are
+                                                    // stored
+        points_.size(), gpar, 1, param_.dim, param_.order, &curve_, &err_num_);
+
+  if (err_num_ >= 0) {
+    is_created_ = true;
+  }
+  return err_num_;
+}
+
 int SislNurbsGen::PlotCurve(std::string filename, float min_par, float max_par,
                             int samples) {
   std::ofstream out(filename, std::ios::trunc | std::ios::out);
@@ -215,10 +256,11 @@ int SislNurbsGen::PlotCurve(std::string filename, float min_par, float max_par,
   return 0;
 }
 
-int SislNurbsGen::CreateCurveByBlendingCurves(SISLCurve* first,
-                                              SISLCurve* second,
-                                              point_2d   point_on_first,
-                                              point_2d   point_on_second) {
+int SislNurbsGen::CreateCurveByBlendingCurves(SISLCurve*  first,
+                                              SISLCurve*  second,
+                                              point_2d    point_on_first,
+                                              point_2d    point_on_second,
+                                              SISLCurve** result) {
   SislPoint p_on_first{static_cast<double>(point_on_first.x),
                        static_cast<double>(point_on_first.y)};
 
@@ -227,7 +269,6 @@ int SislNurbsGen::CreateCurveByBlendingCurves(SISLCurve* first,
 
   double    epsge     = 1.0e-6;  // geometric precision
   int       blendtype = 0;       // polynomial
-  int       stat{};
 
   // find var_par on first curve
   double    var_par_first{};
@@ -235,10 +276,10 @@ int SislNurbsGen::CreateCurveByBlendingCurves(SISLCurve* first,
   s1957(first,
         reinterpret_cast<double*>(&p_on_first),  // endpoint of curve 1
                                                  // (geometric)
-        param_.dim, 1.0e-9, epsge, &var_par_first, &dist_first, &stat);
+        param_.dim, 1.0e-9, epsge, &var_par_first, &dist_first, &err_num_);
 
-  if (stat != 0) {
-    return stat;
+  if (err_num_ < 0) {
+    return err_num_;
   }
 
   // find var_par on first curve
@@ -247,10 +288,10 @@ int SislNurbsGen::CreateCurveByBlendingCurves(SISLCurve* first,
   s1957(second,
         reinterpret_cast<double*>(&p_on_second),  // endpoint of curve 1
                                                   // (geometric)
-        param_.dim, 1.0e-9, epsge, &var_par_second, &dist_second, &stat);
+        param_.dim, 1.0e-9, epsge, &var_par_second, &dist_second, &err_num_);
 
-  if (stat != 0) {
-    return stat;
+  if (err_num_ < 0) {
+    return err_num_;
   }
 
   // Subdivide given curves at parameters
@@ -259,20 +300,30 @@ int SislNurbsGen::CreateCurveByBlendingCurves(SISLCurve* first,
   SISLCurve* second_loc_1;
   SISLCurve* second_loc_2;
 
-  s1710(first, var_par_first, &first_loc_1, &first_loc_2, &stat);
+  s1710(first, var_par_first, &first_loc_1, &first_loc_2, &err_num_);
+
+  if (err_num_ < 0) {
+    return err_num_;
+  }
 
   if (first_loc_2) {
     freeCurve(first_loc_2);
   }
-  s1710(second, var_par_second, &second_loc_1, &second_loc_2, &stat);
+
+  s1710(second, var_par_second, &second_loc_1, &second_loc_2, &err_num_);
+
+  if (err_num_ < 0) {
+    return err_num_;
+  }
 
   if (second_loc_1) {
     freeCurve(second_loc_1);
   }
 
-  if (curve_) {
-    freeCurve(curve_);
+  if (*result) {
+    freeCurve(*result);
   }
+
   s1606(first_loc_1,                              // the first input curve
         second_loc_2,                             // the second input curve
         epsge,                                    // geometric tolerance
@@ -283,15 +334,230 @@ int SislNurbsGen::CreateCurveByBlendingCurves(SISLCurve* first,
         blendtype,     // type of blend curve (circle, conic, polynomial)
         param_.dim,    // dimension
         param_.order,  // order of generated spline curve
-        &curve_,       // the generated curve
-        &stat);        // status message
+        result,        // the generated curve
+        &err_num_);    // status message
 
-  is_created_ = true;
+  if (err_num_ >= 0) {
+    is_created_ = true;
+  }
   freeCurve(first_loc_1);
   freeCurve(second_loc_2);
+  return err_num_;
+}
+
+int SislNurbsGen::CreateConnectedCurveByBlendingCurves(
+    SISLCurve* first, SISLCurve* second, point_2d start_point,
+    point_2d start_blended_crv, point_2d end_point, point_2d end_blended_crv) {
+  is_created_ = false;
+  SislPoint sp_on_first{static_cast<double>(start_point.x),
+                        static_cast<double>(start_point.y)};
+
+  SislPoint ep_on_second{static_cast<double>(end_point.x),
+                         static_cast<double>(end_point.y)};
+
+  SislPoint sp_on_blended{static_cast<double>(start_blended_crv.x),
+                          static_cast<double>(start_blended_crv.y)};
+
+  SislPoint ep_on_blended{static_cast<double>(end_blended_crv.x),
+                          static_cast<double>(end_blended_crv.y)};
+
+  // create blend curve
+  SISLCurve* blended{};
+  if (!first || !second) {
+    return -ENODATA;
+  }
+  err_num_ = CreateCurveByBlendingCurves(first, second, start_blended_crv,
+                                         end_blended_crv, &blended);
+
+  if (err_num_ < 0) {
+    return err_num_;
+  }
+
+  double epsge = 1.0e-6;  // geometric precision
+
+  // find var_par on first curve
+  /////////////////////////////
+  double var_par_first_start{};
+  double var_par_first_end{};
+  double dist_first{};
+  s1957(first,
+        reinterpret_cast<double*>(&sp_on_first),  // startpoint of curve 1
+                                                  // (geometric)
+        param_.dim, 1.0e-9, epsge, &var_par_first_start, &dist_first,
+        &err_num_);
+
+  if (err_num_ < 0) {
+    return err_num_;
+  }
+  s1957(first,
+        reinterpret_cast<double*>(&sp_on_blended),  // endpoint of curve 1
+                                                    // (geometric)
+        param_.dim, 1.0e-9, epsge, &var_par_first_end, &dist_first, &err_num_);
+
+  if (err_num_ < 0) {
+    return err_num_;
+  }
+
+  // find var_par on second curve
+  /////////////////////////////
+  double var_par_second_start{};
+  double var_par_second_end{};
+  double dist_second{};
+  s1957(second,
+        reinterpret_cast<double*>(&ep_on_blended),  // startpoint of curve 2
+                                                    // (geometric)
+        param_.dim, 1.0e-9, epsge, &var_par_second_start, &dist_second,
+        &err_num_);
+
+  if (err_num_ < 0) {
+    return err_num_;
+  }
+  s1957(second,
+        reinterpret_cast<double*>(&ep_on_second),  // endpoint of curve 2
+                                                   // (geometric)
+        param_.dim, 1.0e-9, epsge, &var_par_second_end, &dist_second,
+        &err_num_);
+
+  if (err_num_ < 0) {
+    return err_num_;
+  }
+
+  // Subdivide given curves at parameters
+  SISLCurve* first_subdiv;
+  SISLCurve* second_subdiv;
+
+  s1712(first, var_par_first_start, var_par_first_end, &first_subdiv,
+        &err_num_);
+
+  if (err_num_ < 0) {
+    return err_num_;
+  }
+
+  s1712(second, var_par_second_start, var_par_second_end, &second_subdiv,
+        &err_num_);
+
+  if (err_num_ < 0) {
+    return err_num_;
+  }
+
+  // join first curve with blended curve
+  SISLCurve* first_blended;
+  s1715(first_subdiv, blended,
+        1,               // join first curve at the end
+        0,               // join second curve at the start
+        &first_blended,  // result curve
+        &err_num_);
+
+  SISLCurve* full_crv;
+  s1715(first_blended, second_subdiv,
+        1,          // join first curve at the end
+        0,          // join second curve at the start
+        &full_crv,  // result curve
+        &err_num_);
+
+  if (curve_) {
+    freeCurve(curve_);
+  }
+
+  curve_ = copyCurve(full_crv);
+
+  // free created temporal curves
+  freeCurve(full_crv);
+  freeCurve(first_subdiv);
+  freeCurve(second_subdiv);
+  freeCurve(first_blended);
+  freeCurve(blended);
+
+  is_created_ = true;
+
+  return err_num_;
+}
+
+int SislNurbsGen::CreateCurveByCutAndBranching(SISLCurve* first,
+                                               SISLCurve* second,
+                                               point_2d   point_to_cut) {
+  int       stat{};
+  SislPoint sp_to_cut{static_cast<double>(point_to_cut.x),
+                      static_cast<double>(point_to_cut.y)};
+
+  double    epsge = 1.0e-6;  // geometric precision
+  if (!first || !second) {
+    return -ENODATA;
+  }
+
+  // find var_par on first curve
+  /////////////////////////////
+  double    var_par_first_cut{};
+  double    dist_first{};
+  s1957(first,
+        reinterpret_cast<double*>(&sp_to_cut),  // startpoint of curve 1
+                                                // (geometric)
+        param_.dim, 1.0e-9, epsge, &var_par_first_cut, &dist_first, &stat);
+
+  if (stat < 0) {
+    return stat;
+  }
+
+  // Subdivide a curve at a given parameter value.
+  // Subdivide given curves at parameters
+  SISLCurve* first_split_1{};
+  SISLCurve* first_split_2{};
+
+  s1710(first, var_par_first_cut, &first_split_1, &first_split_2, &stat);
+  if (stat < 0) {
+    return stat;
+  }
+
+  // release the second part of the first curve
+  freeCurve(first_split_2);
+
+  // find var_par on second curve
+  double var_par_second_cut{};
+  s1957(second,
+        reinterpret_cast<double*>(&sp_to_cut),  // startpoint of curve 1
+                                                // (geometric)
+        param_.dim, 1.0e-9, epsge, &var_par_second_cut, &dist_first, &stat);
+
+  if (stat < 0) {
+    return stat;
+  }
+
+  // Subdivide a curve at a given parameter value.
+  // Subdivide given curves at parameters
+  SISLCurve* second_split_1{};
+  SISLCurve* second_split_2{};
+  s1710(second, var_par_second_cut, &second_split_1, &second_split_2, &stat);
+  if (stat < 0) {
+    return stat;
+  }
+  // release the first part of the second curve
+  freeCurve(second_split_1);
+
+  // Join the first part of the first curve with
+  // the second part of the second curve
+  if (curve_) {
+    freeCurve(curve_);
+  }
+  is_created_ = false;
+
+  s1715(first_split_1, second_split_2,
+        1,  // take the end of the first curve
+        0,  // take the start of the second curve
+        &curve_, &stat);
+
+  if (stat < 0) {
+    return stat;
+  }
+
+  is_created_ = true;
+  // this is the end
+
+  freeCurve(first_split_1);
+  freeCurve(second_split_2);
   return stat;
 }
 
+<<<<<<< HEAD
 int SislNurbsGen::CreateConnectedCurveByBlendingCurves(
     SISLCurve* first, SISLCurve* second, point_2d start_point,
     point_2d start_blended_crv, point_2d end_point, point_2d end_blended_crv) {
@@ -491,6 +757,13 @@ int SislNurbsGen::CreateCurveByCutAndBranching(SISLCurve* first,
   freeCurve(first_split_1);
   freeCurve(second_split_2);
   return stat;
+=======
+bool SislNurbsGen::IsCreated() {
+  if (!curve_) {
+    is_created_ = false;
+  }
+  return is_created_;
+>>>>>>> 647feb901ae1909056793f09317391d83714347f
 }
 
 int SislNurbsGen::CreateCurveByPathSegments(path_data* data) {
@@ -506,6 +779,24 @@ int SislNurbsGen::CreateCurveByPathSegments(path_data* data) {
   points_.push_back(
       {static_cast<double>(data->spline[data->splineNum - 1].endPos.x),
        static_cast<double>(data->spline[data->splineNum - 1].endPos.y)});
+  points_type_.push_back(1);
+
+  return CreateCurveByInterpolation();
+}
+
+int SislNurbsGen::CreateCurveByPathSegments(polar_spline* spline,
+                                            int           num_splines) {
+  points_.clear();
+  points_type_.clear();
+
+  for (int i = 0; i < num_splines; i++) {
+    points_.push_back({static_cast<double>(spline[i].startPos.x),
+                       static_cast<double>(spline[i].startPos.y)});
+    points_type_.push_back(1);
+  }
+  // take care of the last point
+  points_.push_back({static_cast<double>(spline[num_splines - 1].endPos.x),
+                     static_cast<double>(spline[num_splines - 1].endPos.y)});
   points_type_.push_back(1);
 
   return CreateCurveByInterpolation();
@@ -556,7 +847,6 @@ int SislNurbsGen::GetPosition(const float par_val, position_2d& pos,
                               const bool neg_x) {
   int    leftknot{0};
   double derive[param_.dim * 2]{};  // 2x to hold the derivatives 1.order
-  int    stat{};
   double add_pi = neg_x ? M_PI : 0;
 
   pos           = {};
@@ -566,19 +856,18 @@ int SislNurbsGen::GetPosition(const float par_val, position_2d& pos,
 
   s1227(curve_,
         1,  // 0 for position, 1 ..x add derivatives
-        par_val, &leftknot, derive, &stat);
-  if (!stat) {
+        par_val, &leftknot, derive, &err_num_);
+  if (!err_num_) {
     pos.x       = derive[kX];
     pos.y       = derive[kY];
     float angle = AngleTool::normaliseAngleSym0(
         atan2(derive[kY + param_.dim], derive[kX + param_.dim]) + add_pi);
     pos.rho = angle;
   }
-  return stat;
+  return err_num_;
 }
 
 int SislNurbsGen::GetCurvature(float par_val, double& curvature) {
-  int    stat{};
   int    leftknot{0};
   double derive[param_.dim * 3]{};  // 2x to hold the derivatives 1.order
   if (!is_created_) {
@@ -587,8 +876,8 @@ int SislNurbsGen::GetCurvature(float par_val, double& curvature) {
 
   s1227(curve_,
         2,  // 0 for position, 1 ..x add derivatives
-        par_val, &leftknot, derive, &stat);
-  if (!stat) {
+        par_val, &leftknot, derive, &err_num_);
+  if (!err_num_) {
     SislPoint first{};
     SislPoint second{};
     first.x    = derive[kX + 2];
@@ -605,7 +894,7 @@ int SislNurbsGen::GetCurvature(float par_val, double& curvature) {
     }
   }
 
-  return stat;
+  return err_num_;
 }
 
 double SislNurbsGen::GetMaxParameterVal() {
@@ -627,8 +916,13 @@ double SislNurbsGen::GetPartialCordLength(float min_par, float max_par,
   position_2d pos2{};
 
   GetPosition(min_par, pos1);
+<<<<<<< HEAD
   for (float f = min_par + inc; f <= max_par; f += inc) {
     GetPosition(f, pos2);
+=======
+  for (float f = min_par + inc; f < max_par; f += inc) {
+    GetPosition(f + inc, pos2);
+>>>>>>> 647feb901ae1909056793f09317391d83714347f
     length += CalcDist(pos1, pos2);
     pos1 = pos2;
   }
@@ -639,21 +933,66 @@ double SislNurbsGen::GetPartialCordLength(float min_par, float max_par,
 double SislNurbsGen::GetFullCordLength() {
   double epsge = 0.001;
   double length;
+<<<<<<< HEAD
   int    stat = 0;
 
   if (curve_) {
     s1240(curve_, epsge, &length, &stat);
+=======
+
+  if (curve_) {
+    s1240(curve_, epsge, &length, &err_num_);
+>>>>>>> 647feb901ae1909056793f09317391d83714347f
   }
   return length;
 }
 
 SISLCurve* SislNurbsGen::GetSislCurve() { return curve_; }
 
+int        SislNurbsGen::SetSislCurve(SISLCurve* curve) {
+  if (curve_) {
+    freeCurve(curve_);
+  }
+  curve_ = copyCurve(curve);
+  return 0;
+}
+
+int SislNurbsGen::GetPoseRelSplineParVal(position_2d& pos, double& par_val) {
+  double    dist{};
+
+  SislPoint p_to_find{static_cast<double>(pos.x), static_cast<double>(pos.y)};
+
+  double    epsge = 1.0e-6;  // geometric precision
+
+  s1957(curve_,
+        reinterpret_cast<double*>(&p_to_find),  // startpoint of curve 1
+                                                // (geometric)
+        param_.dim, 1.0e-9, epsge, &par_val, &dist, &err_num_);
+
+  if (err_num_ < 0) {
+    par_val = 0.0;
+  }
+  return err_num_;
+}
+
+void SislNurbsGen::Reset() {
+  ctrl_.clear();
+  points_.clear();
+  points_type_.clear();
+  inter_points.clear();
+  if (curve_) {
+    freeCurve(curve_);
+  }
+}
+
 SislNurbsGen::SislNurbsGen() {
   ctrl_.reserve(PATH_SPLINE_MAX);
   points_.reserve(PATH_SPLINE_MAX);
   points_type_.reserve(PATH_SPLINE_MAX);
+  inter_points.reserve(PATH_SPLINE_MAX);
+  Reset();
 }
+
 SislNurbsGen::~SislNurbsGen() {
   if (curve_) {
     freeCurve(curve_);
