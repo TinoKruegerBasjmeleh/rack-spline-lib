@@ -560,11 +560,11 @@ bool SislNurbsGen::IsCreated() {
   return is_created_;
 }
 
-int SislNurbsGen::CreateCurveByPathSegments(path_data* data) {
+int SislNurbsGen::CreateCurveByPathSegments(path_data* data, int interval) {
   points_.clear();
   points_type_.clear();
 
-  for (int i = 0; i < data->splineNum; i++) {
+  for (int i = 0; i < data->splineNum; i += interval) {
     points_.push_back({static_cast<double>(data->spline[i].startPos.x),
                        static_cast<double>(data->spline[i].startPos.y)});
     points_type_.push_back(1);
@@ -579,11 +579,12 @@ int SislNurbsGen::CreateCurveByPathSegments(path_data* data) {
 }
 
 int SislNurbsGen::CreateCurveByPathSegments(polar_spline* spline,
-                                            int           num_splines) {
+                                            int           num_splines,
+                                            int interval) {
   points_.clear();
   points_type_.clear();
 
-  for (int i = 0; i < num_splines; i++) {
+  for (int i = 0; i < num_splines; i += interval ) {
     points_.push_back({static_cast<double>(spline[i].startPos.x),
                        static_cast<double>(spline[i].startPos.y)});
     points_type_.push_back(1);
