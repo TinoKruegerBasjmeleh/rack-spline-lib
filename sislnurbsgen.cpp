@@ -566,7 +566,7 @@ int SislNurbsGen::CreateCurveByPathSegments(path_data* data, int interval) {
 
   for (int i = 0; i < data->splineNum; i += interval) {
     // check for unsufficient element count at the end
-    if(data->splineNum - i > std::floor(interval / 2){
+    if (data->splineNum - i > std::floor(interval / 2)) {
       points_.push_back({static_cast<double>(data->spline[i].startPos.x),
                          static_cast<double>(data->spline[i].startPos.y)});
       points_type_.push_back(1);
@@ -588,7 +588,7 @@ int SislNurbsGen::CreateCurveByPathSegments(polar_spline* spline,
 
   for (int i = 0; i < num_splines; i += interval) {
     // check for unsufficient element count at the end
-    if(data->splineNum - i > std::floor(interval / 2){
+    if (num_splines - i > std::floor(interval / 2)) {
       points_.push_back({static_cast<double>(spline[i].startPos.x),
                          static_cast<double>(spline[i].startPos.y)});
       points_type_.push_back(1);
