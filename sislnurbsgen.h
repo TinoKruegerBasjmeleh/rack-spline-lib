@@ -324,8 +324,9 @@ class SislNurbsGen {
   int CreateCurveByConstraintedInterpolation(double angle_start,
                                              double angle_end);
   int CreateCurveByOffset(SISLCurve* base, point_2d& dir, float offset);
-  int CreateCurveByPathSegments(path_data* data);
-  int CreateCurveByPathSegments(polar_spline* spline, int num_splines);
+  int CreateCurveByPathSegments(path_data* data, int interval = 1);
+  int CreateCurveByPathSegments(polar_spline* spline, int num_splines,
+                                int interval = 1);
 
   int CreateCurveByApproximation();
 
