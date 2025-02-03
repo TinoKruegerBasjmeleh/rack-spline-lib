@@ -482,6 +482,23 @@ class SislNurbsGen {
   }
 
   SislNurbsGen();
+  // copy constructor
+  SislNurbsGen(const SislNurbsGen& other)
+      : param_(other.param_),
+        curve_(nullptr),
+        knots_(other.knots_),
+        ctrl_(other.ctrl_),
+        points_(other.points_),
+        points_type_(other.points_type_),
+        knots_created(other.knots_created),
+        params_set(other.params_set),
+        is_created_(false) {
+    // Copy the curve if it exists
+    if (other.curve_) {
+      curve_      = copyCurve(other.curve_);
+      is_created_ = true;
+    }
+  }
   ~SislNurbsGen();
 };
 
