@@ -747,7 +747,6 @@ int        SislNurbsGen::SetSislCurve(SISLCurve* curve) {
 
 int SislNurbsGen::GetPoseRelSplineParVal(position_2d& pos, double& par_val) {
   double    dist{};
-
   SislPoint p_to_find{static_cast<double>(pos.x), static_cast<double>(pos.y)};
 
   double    epsge = 1.0e-6;  // geometric precision
@@ -761,6 +760,41 @@ int SislNurbsGen::GetPoseRelSplineParVal(position_2d& pos, double& par_val) {
     par_val = 0.0;
   }
   return err_num_;
+}
+
+int SislNurbsGen::GetPoseRelSplineParVal(position_2d& pos, double& par_val,
+                                         double& dist) {
+  SislPoint p_to_find{static_cast<double>(pos.x), static_cast<double>(pos.y)};
+
+  double    epsge = 1.0e-6;  // geometric precision
+
+  s1957(curve_,
+        reinterpret_cast<double*>(&p_to_find),  // startpoint of curve 1
+                                                // (geometric)
+        param_.dim, 1.0e-9, epsge, &par_val, &dist, &err_num_);
+
+  if (err_num_ < 0) {
+    par_val = 0.0;
+  }
+  return err_num_;
+}
+
+void SislNurbsGen::CopySislNurbsGen(const SislNurbsGen& to_copy) {
+  // copy member variables
+  param_        = to_copy.param_;
+  curve_        = nullptr;
+  knots_        = to_copy.knots_;
+  ctrl_         = to_copy.ctrl_;
+  points_       = to_copy.points_;
+  points_type_  = to_copy.points_type_;
+  knots_created = to_copy.knots_created;
+  params_set    = to_copy.params_set;
+  is_created_   = false;
+  // Copy the curve if it exists
+  if (to_copy.curve_) {
+    curve_      = copyCurve(to_copy.curve_);
+    is_created_ = true;
+  }
 }
 
 void SislNurbsGen::Reset() {
@@ -779,6 +813,29 @@ SislNurbsGen::SislNurbsGen() {
   points_type_.reserve(PATH_SPLINE_MAX);
   inter_points.reserve(PATH_SPLINE_MAX);
   Reset();
+}
+
+SislNurbsGen::SislNurbsGen(const SislNurbsGen& to_copy) {
+  ctrl_.reserve(PATH_SPLINE_MAX);
+  points_.reserve(PATH_SPLINE_MAX);
+  points_type_.reserve(PATH_SPLINE_MAX);
+  inter_points.reserve(PATH_SPLINE_MAX);
+  Reset();
+  // copy member variables
+  param_        = to_copy.param_;
+  curve_        = nullptr;
+  knots_        = to_copy.knots_;
+  ctrl_         = to_copy.ctrl_;
+  points_       = to_copy.points_;
+  points_type_  = to_copy.points_type_;
+  knots_created = to_copy.knots_created;
+  params_set    = to_copy.params_set;
+  is_created_   = false;
+  // Copy the curve if it exists
+  if (to_copy.curve_) {
+    curve_      = copyCurve(to_copy.curve_);
+    is_created_ = true;
+  }
 }
 
 SislNurbsGen::~SislNurbsGen() {

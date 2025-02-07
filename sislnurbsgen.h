@@ -447,6 +447,16 @@ class SislNurbsGen {
   int        GetPoseRelSplineParVal(position_2d& pos, double& par_val);
 
   /**
+   * @brief GetPoseRelSplineParVal
+   * To compute the parameter value of the curve at a given position.
+   * @param pos - the position to be evaluated
+   * @param par_val - the parameter value of the curve at the given position
+   * @param dist - the distance between the given position and the evaluated
+   * @return success status
+   */
+  int GetPoseRelSplineParVal(position_2d& pos, double& par_val, double& dist);
+
+  /**
    * @brief GetPartialCordLength
    * To compute the length of the curve by sampling the curve
    * at a given sampling rate : the bigger the sample rate the more accurate
@@ -466,6 +476,7 @@ class SislNurbsGen {
 
   SISLCurve* GetSislCurve();
 
+  void        CopySislNurbsGen(const SislNurbsGen& to_copy);
   int        SetSislCurve(SISLCurve* curve);
   void        Reset();
 
@@ -482,6 +493,8 @@ class SislNurbsGen {
   }
 
   SislNurbsGen();
+  // copy constructor
+  SislNurbsGen(const SislNurbsGen& to_copy);
   ~SislNurbsGen();
 };
 
